@@ -1,0 +1,160 @@
+name: build-pack
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "*" ]
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [ published ]
+
+jobs:
+  pack-core:
+    name: Pack (core)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Set package version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            version="${GITHUB_REF#refs/tags/}"
+            version="${version#v}"
+          else
+            version="0.0.0-ci.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "PACKAGE_VERSION=${version}" >> "${GITHUB_ENV}"
+
+      - name: Build managed
+        run: dotnet build IronThorVG/IronThorVG.csproj -c Release
+
+      - name: Pack core
+        shell: bash
+        run: |
+          dotnet pack IronThorVG/IronThorVG.csproj -c Release \
+            -p:Version="${PACKAGE_VERSION}" \
+            -o artifacts/nupkg
+          core_pkg="artifacts/nupkg/IronThorVG.${PACKAGE_VERSION}.nupkg"
+          if [[ -f "${core_pkg}" ]]; then
+            mv "${core_pkg}" "artifacts/nupkg/IronThorVG-${PACKAGE_VERSION}.nupkg"
+          fi
+
+      - name: Upload nupkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-core
+          path: artifacts/nupkg/*.nupkg
+
+  pack:
+    name: Pack (${{ matrix.rid }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            rid: win-x64
+            arch: x64
+          - os: ubuntu-latest
+            rid: linux-x64
+          - os: ubuntu-24.04-arm
+            rid: linux-arm64
+            experimental: true
+    continue-on-error: ${{ matrix.experimental || false }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson pkg-config \
+            libpng-dev libturbojpeg0-dev libwebp-dev libgif-dev \
+            libfreetype6-dev libfontconfig1-dev libharfbuzz-dev libomp-dev
+
+      - name: Install deps (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install meson
+          $pythonScripts = python -c "import sysconfig; print(sysconfig.get_path('scripts'))"
+          $pythonScripts | Out-File -FilePath $env:GITHUB_PATH -Append
+
+      - name: Setup MSVC (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: ${{ matrix.arch }}
+
+      - name: Set package version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            version="${GITHUB_REF#refs/tags/}"
+            version="${version#v}"
+          else
+            version="0.0.0-ci.${GITHUB_RUN_NUMBER}"
+          fi
+          echo "PACKAGE_VERSION=${version}" >> "${GITHUB_ENV}"
+
+      - name: Build native (Linux)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          native_path=$(bash scripts/build-native.sh --output "${GITHUB_WORKSPACE}/artifacts/native/${{ matrix.rid }}")
+          echo "NATIVE_ARTIFACT=${native_path}" >> "${GITHUB_ENV}"
+
+      - name: Build native (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $nativePath = & "$env:GITHUB_WORKSPACE/scripts/build-native.ps1" -Output "$env:GITHUB_WORKSPACE/artifacts/native/${{ matrix.rid }}"
+          $nativePath = $nativePath -replace '\\','/'
+          "NATIVE_ARTIFACT=$nativePath" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Pack native
+        shell: bash
+        run: |
+          case "${{ matrix.rid }}" in
+            win-x64) pack_project="packaging/IronThorVG.Natives.Win-x64.csproj" ;;
+            linux-x64) pack_project="packaging/IronThorVG.Natives.Linux-x64.csproj" ;;
+            linux-arm64) pack_project="packaging/IronThorVG.Natives.Linux-arm64.csproj" ;;
+            *) pack_project="packaging/IronThorVG.Natives.${{ matrix.rid }}.csproj" ;;
+          esac
+          dotnet restore "${pack_project}" -p:RuntimeIdentifier=${{ matrix.rid }}
+          dotnet pack "${pack_project}" -c Release \
+            -p:RuntimeIdentifier=${{ matrix.rid }} \
+            -p:NativeArtifact="${NATIVE_ARTIFACT}" \
+            -p:Version="${PACKAGE_VERSION}" \
+            -o artifacts/nupkg \
+            --no-build --no-restore
+          package_id=$(basename "${pack_project}" .csproj)
+          native_pkg="artifacts/nupkg/${package_id}.${PACKAGE_VERSION}.nupkg"
+          if [[ -f "${native_pkg}" ]]; then
+            mv "${native_pkg}" "artifacts/nupkg/${package_id}-${PACKAGE_VERSION}.nupkg"
+          fi
+
+      - name: Upload nupkg
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg-${{ matrix.rid }}
+          path: artifacts/nupkg/*.nupkg

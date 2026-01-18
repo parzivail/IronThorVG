@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <Version>0.0.0</Version>
+    <Authors>parzivail, ThorVG authors</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/parzivail/IronThorVG</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/parzivail/IronThorVG</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+</Project>

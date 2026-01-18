@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronThorVG", "IronThorVG\IronThorVG.csproj", "{0FADC997-806A-45EA-A1B0-B3B42CA30195}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IronThorVG.Generator", "tools\IronThorVG.Generator\IronThorVG.Generator.csproj", "{3E6B1A35-4C0D-45C8-9B91-AB7A9D5A2C4A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0FADC997-806A-45EA-A1B0-B3B42CA30195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0FADC997-806A-45EA-A1B0-B3B42CA30195}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0FADC997-806A-45EA-A1B0-B3B42CA30195}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0FADC997-806A-45EA-A1B0-B3B42CA30195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E6B1A35-4C0D-45C8-9B91-AB7A9D5A2C4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E6B1A35-4C0D-45C8-9B91-AB7A9D5A2C4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E6B1A35-4C0D-45C8-9B91-AB7A9D5A2C4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E6B1A35-4C0D-45C8-9B91-AB7A9D5A2C4A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

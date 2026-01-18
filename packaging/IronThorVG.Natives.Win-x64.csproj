@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <IsPackable>true</IsPackable>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+        <PackageId>IronThorVG.Natives.Win-x64</PackageId>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(NativeArtifact)' != ''">
+        <None Include="$(NativeArtifact)" Pack="true" PackagePath="runtimes/$(RuntimeIdentifier)/native" />
+    </ItemGroup>
+</Project>
