@@ -53,27 +53,37 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_swcanvas_set_target(CanvasHandle canvas, nint buffer, uint stride, uint w, uint h, Colorspace cs);
 
+    /// <summary>
+    /// This method generates a OpenGL/ES canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
+    /// </summary>
+    /// <param name="op">The rendering engine option.</param>
     /// <returns>A new Tvg_Canvas object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial CanvasHandle tvg_glcanvas_create();
+    internal static partial CanvasHandle tvg_glcanvas_create(EngineOptions op);
 
     /// <summary>
-    /// This function specifies the drawing target where the rasterization will occur. It can target a specific framebuffer object (FBO) or the main surface.
+    /// This function specifies the drawing target where the rasterization will occur. It can target a specific framebuffer object (FBO) or the main surface. the appropriate OpenGL context is already current and will not attempt to bind a new one. Ensure that @ref tvg_canvas_sync() has been called before setting a new target.
     /// </summary>
-    /// <param name="context">The GL context assigning to the current canvas rendering.</param>
+    /// <param name="display">The platform-specific display handle (EGLDisplay for EGL). Set @c nullptr for other systems.</param>
+    /// <param name="surface">The platform-specific surface handle (EGLSurface for EGL, HDC for WGL). Set @c nullptr for other systems.</param>
+    /// <param name="context">The OpenGL context to be used for rendering on this canvas.</param>
     /// <param name="id">The GL target ID, usually indicating the FBO ID. A value of @c 0 specifies the main surface.</param>
     /// <param name="w">The width (in pixels) of the raster image.</param>
     /// <param name="h">The height (in pixels) of the raster image.</param>
     /// <param name="cs">Specifies how the pixel values should be interpreted. Currently, it only allows @c TVG_COLORSPACE_ABGR8888S as @c GL_RGBA8.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_glcanvas_set_target(CanvasHandle canvas, nint context, int id, uint w, uint h, Colorspace cs);
+    internal static partial Result tvg_glcanvas_set_target(CanvasHandle canvas, nint display, nint surface, nint context, int id, uint w, uint h, Colorspace cs);
 
+    /// <summary>
+    /// This method generates a WebGPU canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
+    /// </summary>
+    /// <param name="op">The rendering engine option.</param>
     /// <returns>A new Tvg_Canvas object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial CanvasHandle tvg_wgcanvas_create();
+    internal static partial CanvasHandle tvg_wgcanvas_create(EngineOptions op);
 
     /// <param name="device">WGPUDevice, a desired handle for the wgpu device. If it is @c nullptr, ThorVG will assign an appropriate device internally.</param>
     /// <param name="instance">WGPUInstance, context for all other wgpu objects.</param>
@@ -92,24 +102,23 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_destroy(CanvasHandle canvas);
 
     /// <summary>
-    /// Only the paints pushed into the canvas will be drawing targets. They are retained by the canvas until you call tvg_canvas_remove()
+    /// Adds the specified paint into the canvas root scene. Only paints added to the canvas are considered rendering targets. The canvas retains the paint object until it is explicitly removed via tvg_canvas_remove(). successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the canvas. added to the canvas. If layering is required, ensure paints are added in the desired order.
     /// </summary>
-    /// <param name="canvas">The Tvg_Canvas object managing the @p paint.</param>
-    /// <param name="paint">The Tvg_Paint object to be drawn.</param>
-    /// <returns>Tvg_Result return values:</returns>
+    /// <param name="canvas">A handle to the canvas that will manage the paint object.</param>
+    /// <param name="paint">A handle to the paint object to be rendered.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_canvas_push(CanvasHandle canvas, PaintHandle paint);
+    internal static partial Result tvg_canvas_add(CanvasHandle canvas, PaintHandle paint);
 
     /// <summary>
-    /// This function appends a paint object to root scene of the canvas. If the optional @p at is provided, the new paint object will be inserted immediately before the specified paint object in the root scene. If @p at is @c nullptr, the paint object will be added to the end of the root scene. This parameter must not be @c nullptr. the new paint object will be added. If @c nullptr, the new paint object is added to the end of the root scene. The default is @c nullptr.
+    /// Inserts a paint object into the root scene of the specified canvas. If the the specified paint in the root scene. If @p at is @c nullptr, the paint object is appended to the end of the root scene. This parameter must be a valid canvas handle. This parameter must not be @c nullptr. which @p target will be inserted. If @c nullptr, @p target is appended to the end of the root scene. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the canvas. scene. If layering is required, ensure paints are inserted in the desired order.
     /// </summary>
-    /// <param name="canvas">The Tvg_Canvas object managing the @p paint.</param>
-    /// <param name="target">A pointer to the Paint object to be added into the root scene.</param>
-    /// <param name="at">A pointer to an existing Paint object in the root scene before which</param>
+    /// <param name="canvas">A handle to the canvas that will manage the paint object.</param>
+    /// <param name="target">A handle to the paint object to be inserted into the root scene.</param>
+    /// <param name="at">A handle to an existing paint object in the root scene before</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_canvas_push_at(CanvasHandle canvas, PaintHandle target, PaintHandle at);
+    internal static partial Result tvg_canvas_insert(CanvasHandle canvas, PaintHandle target, PaintHandle at);
 
     /// <summary>
     /// This function removes a specified paint object from the root scene. If no paint object is specified (i.e., the default @c nullptr is used), the function performs to clear all paints from the scene. If @c nullptr, remove all the paints from the root scene.
@@ -891,23 +900,23 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_scene_new();
 
     /// <summary>
-    /// This function appends a paint object to the scene.
+    /// Appends the specified paint object to the given scene. Only paint objects added to the scene are considered rendering targets. This parameter must not be @c nullptr. This parameter must not be @c nullptr. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the scene. scene. If layering is required, ensure the paints are added in the desired order.
     /// </summary>
-    /// <param name="scene">A Tvg_Paint pointer to the scene object.</param>
-    /// <param name="paint">A pointer to the Paint object to be added into the scene.</param>
+    /// <param name="scene">A handle to the scene object.</param>
+    /// <param name="paint">A handle to the paint object to be added to the scene.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push(PaintHandle scene, PaintHandle paint);
+    internal static partial Result tvg_scene_add(PaintHandle scene, PaintHandle paint);
 
     /// <summary>
-    /// This function appends a paint object to the scene. The new paint object @p target will be inserted immediately before the specified paint object @p at in the scene. the new paint object will be added. This parameter must not be @c nullptr.
+    /// Inserts the specified paint object into the scene immediately before the given paint object @p at. The @p at parameter must reference an existing paint object already added to the scene. This parameter must not be @c nullptr. This parameter must not be @c nullptr. which @p target will be inserted. This parameter must not be @c nullptr. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the scene. scene. If layering is required, ensure the paints are added in the desired order.
     /// </summary>
-    /// <param name="scene">A Tvg_Paint pointer to the scene object.</param>
-    /// <param name="target">A pointer to the Paint object to be added into the scene.</param>
-    /// <param name="at">A pointer to an existing Paint object in the scene before which</param>
+    /// <param name="scene">A handle to the scene object.</param>
+    /// <param name="target">A handle to the paint object to be inserted into the scene.</param>
+    /// <param name="at">A handle to an existing paint object in the scene before</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push_at(PaintHandle scene, PaintHandle target, PaintHandle at);
+    internal static partial Result tvg_scene_insert(PaintHandle scene, PaintHandle target, PaintHandle at);
 
     /// <summary>
     /// This function removes a specified paint object from the scene. If no paint object is specified (i.e., the default @c nullptr is used), the function performs to clear all paints from the scene. If @c nullptr, remove all the paints from the scene.
@@ -924,10 +933,10 @@ internal static partial class ThorVGNative
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_reset_effects(PaintHandle scene);
+    internal static partial Result tvg_scene_clear_effects(PaintHandle scene);
 
     /// <summary>
-    /// This function applies a Gaussian blur filter to the scene as a post-processing effect. The blur can be applied in different directions with configurable border handling and quality settings.
+    /// This function adds a Gaussian blur filter to the scene as a post-processing effect. The blur can be applied in different directions with configurable border handling and quality settings.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="sigma">The blur radius (sigma) value. Must be greater than 0.</param>
@@ -936,10 +945,10 @@ internal static partial class ThorVGNative
     /// <param name="quality">Blur quality level [0 - 100].</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push_effect_gaussian_blur(PaintHandle scene, double sigma, int direction, int border, int quality);
+    internal static partial Result tvg_scene_add_effect_gaussian_blur(PaintHandle scene, double sigma, int direction, int border, int quality);
 
     /// <summary>
-    /// This function applies a drop shadow with a Gaussian blur to the scene. The shadow can be customized using color, opacity, angle, distance, blur radius (sigma), and quality parameters.
+    /// This function adds a drop shadow with a Gaussian blur to the scene. The shadow can be customized using color, opacity, angle, distance, blur radius (sigma), and quality parameters.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="r">Red channel value of the shadow color [0 - 255].</param>
@@ -952,7 +961,7 @@ internal static partial class ThorVGNative
     /// <param name="quality">Blur quality level [0 - 100].</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push_effect_drop_shadow(PaintHandle scene, int r, int g, int b, int a, double angle, double distance, double sigma, int quality);
+    internal static partial Result tvg_scene_add_effect_drop_shadow(PaintHandle scene, int r, int g, int b, int a, double angle, double distance, double sigma, int quality);
 
     /// <summary>
     /// This function overrides the scene's content colors with the specified fill color.
@@ -964,7 +973,7 @@ internal static partial class ThorVGNative
     /// <param name="a">Alpha (opacity) channel value [0 - 255].</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push_effect_fill(PaintHandle scene, int r, int g, int b, int a);
+    internal static partial Result tvg_scene_add_effect_fill(PaintHandle scene, int r, int g, int b, int a);
 
     /// <summary>
     /// This function tints the current scene using specified black and white color values, modulated by a given intensity.
@@ -979,10 +988,10 @@ internal static partial class ThorVGNative
     /// <param name="intensity">Tint intensity value [0 - 100].</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push_effect_tint(PaintHandle scene, int black_r, int black_g, int black_b, int white_r, int white_g, int white_b, double intensity);
+    internal static partial Result tvg_scene_add_effect_tint(PaintHandle scene, int black_r, int black_g, int black_b, int white_r, int white_g, int white_b, double intensity);
 
     /// <summary>
-    /// This function applies a tritone color effect to the given scene using three sets of RGB values representing shadow, midtone, and highlight colors.
+    /// This function adds a tritone color effect to the given scene using three sets of RGB values representing shadow, midtone, and highlight colors.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="shadow_r">Red component of the shadow color [0 - 255].</param>
@@ -997,7 +1006,7 @@ internal static partial class ThorVGNative
     /// <param name="blend">A blending factor that determines the mix between the original color and the tritone colors [0 - 255].</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_scene_push_effect_tritone(PaintHandle scene, int shadow_r, int shadow_g, int shadow_b, int midtone_r, int midtone_g, int midtone_b, int highlight_r, int highlight_g, int highlight_b, int blend);
+    internal static partial Result tvg_scene_add_effect_tritone(PaintHandle scene, int shadow_r, int shadow_g, int shadow_b, int midtone_r, int midtone_g, int midtone_b, int highlight_r, int highlight_g, int highlight_b, int blend);
 
     /// <summary>
     /// This function allocates and returns a new Text instance. To properly destroy the Text object, use @ref tvg_paint_rel().
@@ -1190,7 +1199,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_animation_set_frame(AnimationHandle animation, float no);
 
     /// <summary>
-    /// This function provides access to the picture instance that can be used to load animation formats, such as lot. After setting up the picture, it can be pushed to the designated canvas, enabling control over animation frames with this Animation instance.
+    /// This function provides access to the picture instance that can be used to load animation formats, such as lot. After setting up the picture, it can be added to the designated canvas, enabling control over animation frames with this Animation instance.
     /// </summary>
     /// <param name="animation">A Tvg_Animation pointer to the animation object.</param>
     /// <returns>A picture instance that is tied to this animation.</returns>

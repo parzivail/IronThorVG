@@ -73,8 +73,8 @@ public abstract class Canvas : IDisposable
         return new GlCanvas();
     }
 
-    /// <inheritdoc cref="ThorVGNative.tvg_canvas_push(CanvasHandle, PaintHandle)" />
-    public void Push(Paint paint)
+    /// <inheritdoc cref="ThorVGNative.tvg_canvas_add(CanvasHandle, PaintHandle)" />
+    public void Add(Paint paint)
     {
         EnsureNotDisposed();
         if (paint is null)
@@ -82,11 +82,11 @@ public abstract class Canvas : IDisposable
             throw new ArgumentNullException(nameof(paint));
         }
 
-        ResultGuard.EnsureSuccess(ThorVGNative.tvg_canvas_push(Handle, paint.Handle));
+        ResultGuard.EnsureSuccess(ThorVGNative.tvg_canvas_add(Handle, paint.Handle));
     }
 
-    /// <inheritdoc cref="ThorVGNative.tvg_canvas_push_at(CanvasHandle, PaintHandle, PaintHandle)" />
-    public void PushAt(Paint paint, Paint? before)
+    /// <inheritdoc cref="ThorVGNative.tvg_canvas_insert(CanvasHandle, PaintHandle, PaintHandle)" />
+    public void Insert(Paint paint, Paint? before)
     {
         EnsureNotDisposed();
         if (paint is null)
@@ -94,7 +94,7 @@ public abstract class Canvas : IDisposable
             throw new ArgumentNullException(nameof(paint));
         }
 
-        ResultGuard.EnsureSuccess(ThorVGNative.tvg_canvas_push_at(Handle, paint.Handle, before?.Handle));
+        ResultGuard.EnsureSuccess(ThorVGNative.tvg_canvas_insert(Handle, paint.Handle, before?.Handle));
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_canvas_remove(CanvasHandle, PaintHandle)" />

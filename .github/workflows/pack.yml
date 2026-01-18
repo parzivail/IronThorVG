@@ -35,6 +35,10 @@ jobs:
           fi
           echo "PACKAGE_VERSION=${version}" >> "${GITHUB_ENV}"
 
+      - name: Generate bindings
+        shell: bash
+        run: bash scripts/generate-bindings.sh
+
       - name: Build managed
         run: dotnet build IronThorVG/IronThorVG.csproj -c Release
 
