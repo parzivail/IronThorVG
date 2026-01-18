@@ -68,9 +68,9 @@ public abstract class Canvas : IDisposable
     /// <summary>
     /// Creates an OpenGL canvas.
     /// </summary>
-    public static GlCanvas CreateOpenGl()
+    public static GlCanvas CreateOpenGl(EngineOptions options = EngineOptions.Default)
     {
-        return new GlCanvas();
+        return new GlCanvas(options);
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_canvas_add(CanvasHandle, PaintHandle)" />
