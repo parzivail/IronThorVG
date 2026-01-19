@@ -23,11 +23,11 @@ public sealed class Scene : Paint
 
     /// <inheritdoc cref="ThorVGNative.tvg_scene_insert(PaintHandle, PaintHandle, PaintHandle)" />
     public void Insert(Paint paint, Paint? before)
-        => ResultGuard.EnsureSuccess(ThorVGNative.tvg_scene_insert(Handle, paint.Handle, before?.Handle));
+        => ResultGuard.EnsureSuccess(ThorVGNative.tvg_scene_insert(Handle, paint.Handle, before?.Handle ?? PaintHandle.Null));
 
     /// <inheritdoc cref="ThorVGNative.tvg_scene_remove(PaintHandle, PaintHandle)" />
     public void Remove(Paint? paint = null)
-        => ResultGuard.EnsureSuccess(ThorVGNative.tvg_scene_remove(Handle, paint?.Handle));
+        => ResultGuard.EnsureSuccess(ThorVGNative.tvg_scene_remove(Handle, paint?.Handle ?? PaintHandle.Null));
 
     /// <inheritdoc cref="ThorVGNative.tvg_scene_clear_effects(PaintHandle)" />
     public void ClearEffects()

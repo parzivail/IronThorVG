@@ -9,7 +9,7 @@ namespace IronThorVG.Native;
 internal static partial class ThorVGNative
 {
     /// <summary>
-    /// ThorVG requires an active runtime environment to operate. Internally, it utilizes a task scheduler to efficiently parallelize rendering operations. You can specify the number of worker threads using the @p threads parameter. During initialization, ThorVG will spawn the specified number of threads. The number of threads is fixed on the first call to tvg_engine_init() and cannot be changed in subsequent calls.
+    /// Initializes the ThorVG engine. ThorVG requires an active runtime environment to operate. Internally, it utilizes a task scheduler to efficiently parallelize rendering operations. You can specify the number of worker threads using the @p threads parameter. During initialization, ThorVG will spawn the specified number of threads. The number of threads is fixed on the first call to tvg_engine_init() and cannot be changed in subsequent calls.
     /// </summary>
     /// <param name="threads">The number of worker threads to create. A value of zero indicates that only the main thread will be used.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -17,12 +17,15 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_engine_init(uint threads);
 
     /// <summary>
-    /// Cleans up resources and stops any internal threads initialized by tvg_engine_init().
+    /// Terminates the ThorVG engine. Cleans up resources and stops any internal threads initialized by tvg_engine_init().
     /// </summary>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_engine_term();
 
+    /// <summary>
+    /// Retrieves the version of the TVG engine.
+    /// </summary>
     /// <param name="major">A major version number.</param>
     /// <param name="minor">A minor version number.</param>
     /// <param name="micro">A micro version number.</param>
@@ -32,7 +35,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_engine_version(out uint major, out uint minor, out uint micro, out nint version);
 
     /// <summary>
-    /// This method generates a software canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
+    /// Creates a new Software Canvas object with optional rendering engine settings. This method generates a software canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
     /// </summary>
     /// <param name="op">The rendering engine option.</param>
     /// <returns>A new Tvg_Canvas object.</returns>
@@ -41,7 +44,7 @@ internal static partial class ThorVGNative
     internal static partial CanvasHandle tvg_swcanvas_create(EngineOptions op);
 
     /// <summary>
-    /// For optimisation reasons TVG does not allocate memory for the output buffer on its own. The buffer of a desirable size should be allocated and owned by the caller.
+    /// Sets the buffer used in the rasterization process and defines the used colorspace. For optimisation reasons TVG does not allocate memory for the output buffer on its own. The buffer of a desirable size should be allocated and owned by the caller.
     /// </summary>
     /// <param name="canvas">The Tvg_Canvas object managing the @p buffer.</param>
     /// <param name="buffer">A pointer to the allocated memory block of the size @p stride x @p h.</param>
@@ -54,7 +57,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_swcanvas_set_target(CanvasHandle canvas, nint buffer, uint stride, uint w, uint h, Colorspace cs);
 
     /// <summary>
-    /// This method generates a OpenGL/ES canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
+    /// Creates a new OpenGL/ES Canvas object with optional rendering engine settings. This method generates a OpenGL/ES canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
     /// </summary>
     /// <param name="op">The rendering engine option.</param>
     /// <returns>A new Tvg_Canvas object.</returns>
@@ -63,7 +66,7 @@ internal static partial class ThorVGNative
     internal static partial CanvasHandle tvg_glcanvas_create(EngineOptions op);
 
     /// <summary>
-    /// This function specifies the drawing target where the rasterization will occur. It can target a specific framebuffer object (FBO) or the main surface. the appropriate OpenGL context is already current and will not attempt to bind a new one. Ensure that @ref tvg_canvas_sync() has been called before setting a new target.
+    /// Sets the drawing target for rasterization. This function specifies the drawing target where the rasterization will occur. It can target a specific framebuffer object (FBO) or the main surface. the appropriate OpenGL context is already current and will not attempt to bind a new one. Ensure that @ref tvg_canvas_sync() has been called before setting a new target.
     /// </summary>
     /// <param name="display">The platform-specific display handle (EGLDisplay for EGL). Set @c nullptr for other systems.</param>
     /// <param name="surface">The platform-specific surface handle (EGLSurface for EGL, HDC for WGL). Set @c nullptr for other systems.</param>
@@ -77,7 +80,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_glcanvas_set_target(CanvasHandle canvas, nint display, nint surface, nint context, int id, uint w, uint h, Colorspace cs);
 
     /// <summary>
-    /// This method generates a WebGPU canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
+    /// Creates a new WebGPU Canvas object with optional rendering engine settings. This method generates a WebGPU canvas instance that can be used for drawing vector graphics. It accepts an optional parameter @p op to choose between different rendering engine behaviors.
     /// </summary>
     /// <param name="op">The rendering engine option.</param>
     /// <returns>A new Tvg_Canvas object.</returns>
@@ -85,6 +88,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial CanvasHandle tvg_wgcanvas_create(EngineOptions op);
 
+    /// <summary>
+    /// Sets the drawing target for the rasterization.
+    /// </summary>
     /// <param name="device">WGPUDevice, a desired handle for the wgpu device. If it is @c nullptr, ThorVG will assign an appropriate device internally.</param>
     /// <param name="instance">WGPUInstance, context for all other wgpu objects.</param>
     /// <param name="target">Either WGPUSurface or WGPUTexture, serving as handles to a presentable surface or texture.</param>
@@ -96,13 +102,16 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_wgcanvas_set_target(CanvasHandle canvas, nint device, nint instance, nint target, uint w, uint h, Colorspace cs, int type);
 
+    /// <summary>
+    /// Clears the canvas internal data, releases all paints stored by the canvas and destroys the canvas object itself.
+    /// </summary>
     /// <param name="canvas">The Tvg_Canvas object to be destroyed.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_canvas_destroy(CanvasHandle canvas);
 
     /// <summary>
-    /// Adds the specified paint into the canvas root scene. Only paints added to the canvas are considered rendering targets. The canvas retains the paint object until it is explicitly removed via tvg_canvas_remove(). successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the canvas. added to the canvas. If layering is required, ensure paints are added in the desired order.
+    /// Adds a paint object to the canvas for rendering. Adds the specified paint into the canvas root scene. Only paints added to the canvas are considered rendering targets. The canvas retains the paint object until it is explicitly removed via tvg_canvas_remove(). successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the canvas. added to the canvas. If layering is required, ensure paints are added in the desired order.
     /// </summary>
     /// <param name="canvas">A handle to the canvas that will manage the paint object.</param>
     /// <param name="paint">A handle to the paint object to be rendered.</param>
@@ -111,7 +120,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_add(CanvasHandle canvas, PaintHandle paint);
 
     /// <summary>
-    /// Inserts a paint object into the root scene of the specified canvas. If the the specified paint in the root scene. If @p at is @c nullptr, the paint object is appended to the end of the root scene. This parameter must be a valid canvas handle. This parameter must not be @c nullptr. which @p target will be inserted. If @c nullptr, @p target is appended to the end of the root scene. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the canvas. scene. If layering is required, ensure paints are inserted in the desired order.
+    /// Inserts a paint object into the canvas root scene. Inserts a paint object into the root scene of the specified canvas. If the the specified paint in the root scene. If @p at is @c nullptr, the paint object is appended to the end of the root scene. This parameter must be a valid canvas handle. This parameter must not be @c nullptr. which @p target will be inserted. If @c nullptr, @p target is appended to the end of the root scene. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the canvas. scene. If layering is required, ensure paints are inserted in the desired order.
     /// </summary>
     /// <param name="canvas">A handle to the canvas that will manage the paint object.</param>
     /// <param name="target">A handle to the paint object to be inserted into the root scene.</param>
@@ -121,7 +130,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_insert(CanvasHandle canvas, PaintHandle target, PaintHandle at);
 
     /// <summary>
-    /// This function removes a specified paint object from the root scene. If no paint object is specified (i.e., the default @c nullptr is used), the function performs to clear all paints from the scene. If @c nullptr, remove all the paints from the root scene.
+    /// Removes a paint object from the root scene. This function removes a specified paint object from the root scene. If no paint object is specified (i.e., the default @c nullptr is used), the function performs to clear all paints from the scene. If @c nullptr, remove all the paints from the root scene.
     /// </summary>
     /// <param name="canvas">A Tvg_Canvas object to remove the @p paint.</param>
     /// <param name="paint">A pointer to the Paint object to be removed from the root scene.</param>
@@ -130,7 +139,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_remove(CanvasHandle canvas, PaintHandle paint);
 
     /// <summary>
-    /// This function triggers an internal update for all paint instances that have been modified since the last update. It ensures that the canvas state is ready for accurate rendering. This may occur if the canvas target has not been set or if the update is called during drawing. Call tvg_canvas_sync() before trying.
+    /// Requests the canvas to update modified paint objects in preparation for rendering. This function triggers an internal update for all paint instances that have been modified since the last update. It ensures that the canvas state is ready for accurate rendering. This may occur if the canvas target has not been set or if the update is called during drawing. Call tvg_canvas_sync() before trying.
     /// </summary>
     /// <param name="canvas">The Tvg_Canvas object to be updated.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -138,7 +147,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_update(CanvasHandle canvas);
 
     /// <summary>
-    /// This may occur if the canvas target has not been set or if the update is called during drawing. without calling tvg_canvas_sync() in between. with opaque content. Skipping the clear can improve performance. To ensure the drawing process is complete, call sync() afterwards.
+    /// Requests the canvas to render the Paint objects. This may occur if the canvas target has not been set or if the update is called during drawing. without calling tvg_canvas_sync() in between. with opaque content. Skipping the clear can improve performance. To ensure the drawing process is complete, call sync() afterwards.
     /// </summary>
     /// <param name="canvas">The Tvg_Canvas object containing elements to be drawn.</param>
     /// <param name="clear">If @c true, clears the target buffer to zero before drawing.</param>
@@ -147,7 +156,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_draw(CanvasHandle canvas, [MarshalAs(UnmanagedType.I1)] bool clear);
 
     /// <summary>
-    /// The Canvas rendering can be performed asynchronously. To make sure that rendering is finished, the tvg_canvas_sync() must be called after the tvg_canvas_draw() regardless of threading.
+    /// Guarantees that drawing task is finished. The Canvas rendering can be performed asynchronously. To make sure that rendering is finished, the tvg_canvas_sync() must be called after the tvg_canvas_draw() regardless of threading.
     /// </summary>
     /// <param name="canvas">The Tvg_Canvas object containing elements which were drawn.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -155,7 +164,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_sync(CanvasHandle canvas);
 
     /// <summary>
-    /// This function defines a rectangular area of the canvas to be used for drawing operations. The specified viewport clips rendering output to the boundaries of that rectangle. Please note that changing the viewport is only allowed at the beginning of the rendering sequence—that is, after calling tvg_canvas_sync(). tvg_canvas_remove(), tvg_canvas_update(), or tvg_canvas_draw().
+    /// Sets the drawing region of the canvas. This function defines a rectangular area of the canvas to be used for drawing operations. The specified viewport clips rendering output to the boundaries of that rectangle. Please note that changing the viewport is only allowed at the beginning of the rendering sequence—that is, after calling tvg_canvas_sync(). tvg_canvas_remove(), tvg_canvas_update(), or tvg_canvas_draw().
     /// </summary>
     /// <param name="canvas">The Tvg_Canvas object containing elements which were drawn.</param>
     /// <param name="x">The x-coordinate of the upper-left corner of the rectangle.</param>
@@ -167,7 +176,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_canvas_set_viewport(CanvasHandle canvas, int x, int y, int w, int h);
 
     /// <summary>
-    /// This is the counterpart to the `new()` API, and releases the given Paint object safely, handling @c nullptr and managing ownership properly.
+    /// Safely releases a Tv_Paint object. This is the counterpart to the `new()` API, and releases the given Paint object safely, handling @c nullptr and managing ownership properly.
     /// </summary>
     /// <param name="paint">A Tvg_Paint object to release.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -175,7 +184,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_rel(PaintHandle paint);
 
     /// <summary>
-    /// This method increases the reference count of Tvg_Paint object, allowing shared ownership and control over its lifetime.
+    /// Increment the reference count for the Tvg_Paint object. This method increases the reference count of Tvg_Paint object, allowing shared ownership and control over its lifetime.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to increase the reference count.</param>
     /// <returns>The updated reference count after the increment by 1.</returns>
@@ -184,7 +193,7 @@ internal static partial class ThorVGNative
     internal static partial ushort tvg_paint_ref(PaintHandle paint);
 
     /// <summary>
-    /// This method decreases the reference count of the Tvg_Paint object by 1. If the reference count reaches zero and the @p free flag is set to true, the instance is automatically deleted.
+    /// Decrement the reference count for the Tvg_Paint object. This method decreases the reference count of the Tvg_Paint object by 1. If the reference count reaches zero and the @p free flag is set to true, the instance is automatically deleted.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to decrease the reference count.</param>
     /// <param name="free">Flag indicating whether to delete the Paint instance when the reference count reaches zero.</param>
@@ -194,7 +203,7 @@ internal static partial class ThorVGNative
     internal static partial ushort tvg_paint_unref(PaintHandle paint, [MarshalAs(UnmanagedType.I1)] bool free);
 
     /// <summary>
-    /// This method provides the current reference count, allowing the user to check the shared ownership state of the Tvg_Paint object.
+    /// Retrieve the current reference count of the Tvg_Paint object. This method provides the current reference count, allowing the user to check the shared ownership state of the Tvg_Paint object.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to return the reference count.</param>
     /// <returns>The current reference count of the Tvg_Paint object.</returns>
@@ -203,7 +212,7 @@ internal static partial class ThorVGNative
     internal static partial ushort tvg_paint_get_ref(PaintHandle paint);
 
     /// <summary>
-    /// This is useful for selectively excluding paint objects during rendering. in internal update processing if its properties are updated, but it will not be taken into account for the final drawing output. To completely deactivate a paint object, remove it from the canvas.
+    /// Sets the visibility of the Paint object. This is useful for selectively excluding paint objects during rendering. in internal update processing if its properties are updated, but it will not be taken into account for the final drawing output. To completely deactivate a paint object, remove it from the canvas.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to set the visibility status.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -211,7 +220,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_set_visible(PaintHandle paint, [MarshalAs(UnmanagedType.I1)] bool visible);
 
     /// <summary>
-    /// false if the object is hidden and will not be rendered.
+    /// Gets the current visibility status of the Paint object. false if the object is hidden and will not be rendered.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to return the visibility status.</param>
     /// <returns>true if the object is visible and will be rendered.</returns>
@@ -220,6 +229,9 @@ internal static partial class ThorVGNative
     [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool tvg_paint_get_visible(PaintHandle paint);
 
+    /// <summary>
+    /// Scales the given Tvg_Paint object by the given factor.
+    /// </summary>
     /// <param name="paint">The Tvg_Paint object to be scaled.</param>
     /// <param name="factor">The value of the scaling factor. The default value is 1.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -227,7 +239,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_scale(PaintHandle paint, float factor);
 
     /// <summary>
-    /// The angle in measured clockwise from the horizontal axis. The rotational axis passes through the point on the object with zero coordinates.
+    /// Rotates the given Tvg_Paint by the given angle. The angle in measured clockwise from the horizontal axis. The rotational axis passes through the point on the object with zero coordinates.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to be rotated.</param>
     /// <param name="degree">The value of the rotation angle in degrees.</param>
@@ -236,7 +248,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_rotate(PaintHandle paint, float degree);
 
     /// <summary>
-    /// The origin of the coordinate system is in the upper-left corner of the canvas. The horizontal and vertical axes point to the right and down, respectively.
+    /// Moves the given Tvg_Paint in a two-dimensional space. The origin of the coordinate system is in the upper-left corner of the canvas. The horizontal and vertical axes point to the right and down, respectively.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to be shifted.</param>
     /// <param name="x">The value of the horizontal shift.</param>
@@ -246,7 +258,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_translate(PaintHandle paint, float x, float y);
 
     /// <summary>
-    /// The augmented matrix of the transformation is expected to be given.
+    /// Transforms the given Tvg_Paint using the augmented transformation matrix. The augmented matrix of the transformation is expected to be given.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to be transformed.</param>
     /// <param name="m">The 3x3 augmented matrix.</param>
@@ -255,7 +267,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_set_transform(PaintHandle paint, in Matrix m);
 
     /// <summary>
-    /// In case no transformation was applied, the identity matrix is returned.
+    /// Gets the matrix of the affine transformation of the given Tvg_Paint object. In case no transformation was applied, the identity matrix is returned.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to get the transformation matrix.</param>
     /// <param name="m">The 3x3 augmented matrix.</param>
@@ -263,12 +275,18 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_paint_get_transform(PaintHandle paint, out Matrix m);
 
+    /// <summary>
+    /// Sets the opacity of the given Tvg_Paint.
+    /// </summary>
     /// <param name="paint">The Tvg_Paint object of which the opacity value is to be set.</param>
     /// <param name="opacity">The opacity value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_paint_set_opacity(PaintHandle paint, byte opacity);
 
+    /// <summary>
+    /// Gets the opacity of the given Tvg_Paint.
+    /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to get the opacity value.</param>
     /// <param name="opacity">The opacity value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -276,7 +294,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_get_opacity(PaintHandle paint, out byte opacity);
 
     /// <summary>
-    /// Creates a new object and sets its all properties as in the original object.
+    /// Duplicates the given Tvg_Paint object. Creates a new object and sets its all properties as in the original object.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object to be copied.</param>
     /// <returns>A copied Tvg_Paint object if succeed, @c nullptr otherwise.</returns>
@@ -285,7 +303,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_paint_duplicate(PaintHandle paint);
 
     /// <summary>
-    /// This function determines whether the specified rectangular region—defined by (`x`, `y`, `w`, `h`)— intersects the geometric fill region of the paint object. This is useful for hit-testing purposes, such as detecting whether a user interaction (e.g., touch or click) occurs within a painted region. The paint must be updated in a Canvas beforehand—typically after the Canvas has been drawn and synchronized.
+    /// Checks whether a given region intersects the filled area of the paint. This function determines whether the specified rectangular region—defined by (`x`, `y`, `w`, `h`)— intersects the geometric fill region of the paint object. This is useful for hit-testing purposes, such as detecting whether a user interaction (e.g., touch or click) occurs within a painted region. The paint must be updated in a Canvas beforehand—typically after the Canvas has been drawn and synchronized.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object to be tested.</param>
     /// <param name="x">The x-coordinate of the top-left corner of the test region.</param>
@@ -299,7 +317,7 @@ internal static partial class ThorVGNative
     internal static partial bool tvg_paint_intersects(PaintHandle paint, int x, int y, int w, int h);
 
     /// <summary>
-    /// Returns the bounding box of the paint as an axis-aligned bounding box (AABB), with all relevant transformations applied. The returned values @p x, @p y, @p w, @p h, may have invalid if the operation fails. Thus, please check the retval. This bounding box can be used to determine the actual rendered area of the object on the canvas, for purposes such as hit-testing, culling, or layout calculations.
+    /// Retrieves the axis-aligned bounding box (AABB) of the paint object in canvas space. Returns the bounding box of the paint as an axis-aligned bounding box (AABB), with all relevant transformations applied. The returned values @p x, @p y, @p w, @p h, may have invalid if the operation fails. Thus, please check the retval. This bounding box can be used to determine the actual rendered area of the object on the canvas, for purposes such as hit-testing, culling, or layout calculations.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to get the bounds.</param>
     /// <param name="x">The x-coordinate of the upper-left corner of the bounding box.</param>
@@ -311,7 +329,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_get_aabb(PaintHandle paint, out float x, out float y, out float w, out float h);
 
     /// <summary>
-    /// This function returns the bounding box of the paint, as an oriented bounding box (OBB) after transformations are applied. The returned values @p pt4 may have invalid if the operation fails. Thus, please check the retval. This bounding box can be used to obtain the transformed bounding region in canvas space by taking the geometry's axis-aligned bounding box (AABB) in the object's local coordinate space and applying the object's transformations.
+    /// Retrieves the object-oriented bounding box (OBB) of the paint object in canvas space. This function returns the bounding box of the paint, as an oriented bounding box (OBB) after transformations are applied. The returned values @p pt4 may have invalid if the operation fails. Thus, please check the retval. This bounding box can be used to obtain the transformed bounding region in canvas space by taking the geometry's axis-aligned bounding box (AABB) in the object's local coordinate space and applying the object's transformations.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to get the bounds.</param>
     /// <param name="pt4">An array of four points representing the bounding box. The array size must be 4.</param>
@@ -319,6 +337,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_paint_get_obb(PaintHandle paint, out Point pt4);
 
+    /// <summary>
+    /// Sets the masking target object and the masking method.
+    /// </summary>
     /// <param name="paint">The source object of the masking.</param>
     /// <param name="target">The target object of the masking.</param>
     /// <param name="method">The method used to mask the source object with the target.</param>
@@ -326,6 +347,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_paint_set_mask_method(PaintHandle paint, PaintHandle target, MaskMethod method);
 
+    /// <summary>
+    /// Gets the masking target object and the masking method.
+    /// </summary>
     /// <param name="paint">The source object of the masking.</param>
     /// <param name="target">The target object of the masking.</param>
     /// <param name="method">The method used to mask the source object with the target.</param>
@@ -334,7 +358,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_get_mask_method(PaintHandle paint, out PaintHandle target, out MaskMethod method);
 
     /// <summary>
-    /// This function restricts the drawing area of the paint object to the specified shape's paths.
+    /// Clip the drawing region of the paint object. This function restricts the drawing area of the paint object to the specified shape's paths.
     /// </summary>
     /// <param name="paint">The target object of the clipping.</param>
     /// <param name="clipper">The shape object as the clipper.</param>
@@ -343,7 +367,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_set_clip(PaintHandle paint, PaintHandle clipper);
 
     /// <summary>
-    /// This function returns the clipper that has been previously set to this paint object.
+    /// Get the clipper shape of the paint object. This function returns the clipper that has been previously set to this paint object.
     /// </summary>
     /// <returns>The shape object used as the clipper, or @c nullptr if no clipper is set.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -351,7 +375,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_paint_get_clip(PaintHandle paint);
 
     /// <summary>
-    /// This function returns a pointer to the parent object if the current paint belongs to one. Otherwise, it returns @c nullptr.
+    /// Retrieves the parent paint object. This function returns a pointer to the parent object if the current paint belongs to one. Otherwise, it returns @c nullptr.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to get the scene.</param>
     /// <returns>A pointer to the parent object if available, otherwise @c nullptr.</returns>
@@ -359,6 +383,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial PaintHandle tvg_paint_get_parent(PaintHandle paint);
 
+    /// <summary>
+    /// Gets the unique value of the paint instance indicating the instance type.
+    /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to get the type value.</param>
     /// <param name="type">The unique type of the paint instance type.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -366,7 +393,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_get_type(PaintHandle paint, out Type type);
 
     /// <summary>
-    /// The blending feature allows you to combine colors to create visually appealing effects, including transparency, lighting, shading, and color mixing, among others. its process involves the combination of colors or images from the source paint object with the destination (the lower layer image) using blending operations. The blending operation is determined by the chosen @p BlendMethod, which specifies how the colors or images are combined.
+    /// Sets the blending method for the paint object. The blending feature allows you to combine colors to create visually appealing effects, including transparency, lighting, shading, and color mixing, among others. its process involves the combination of colors or images from the source paint object with the destination (the lower layer image) using blending operations. The blending operation is determined by the chosen @p BlendMethod, which specifies how the colors or images are combined.
     /// </summary>
     /// <param name="paint">The Tvg_Paint object of which to set the blend method.</param>
     /// <param name="method">The blending method to be set.</param>
@@ -375,7 +402,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_paint_set_blend_method(PaintHandle paint, BlendMethod method);
 
     /// <summary>
-    /// This function allocates and returns a new Shape instance. To properly destroy the Shape object, use @ref tvg_paint_rel().
+    /// Creates a new Shape object. This function allocates and returns a new Shape instance. To properly destroy the Shape object, use @ref tvg_paint_rel().
     /// </summary>
     /// <returns>A pointer to the newly created Shape object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -383,7 +410,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_shape_new();
 
     /// <summary>
-    /// The color, the fill and the stroke properties are retained.
+    /// Resets the shape path properties. The color, the fill and the stroke properties are retained.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -391,7 +418,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_reset(PaintHandle paint);
 
     /// <summary>
-    /// The value of the current point is set to the given point.
+    /// Sets the initial point of the sub-path. The value of the current point is set to the given point.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="x">The horizontal coordinate of the initial point of the sub-path.</param>
@@ -401,7 +428,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_move_to(PaintHandle paint, float x, float y);
 
     /// <summary>
-    /// The value of the current point is set to the given end-point.
+    /// Adds a new point to the sub-path, which results in drawing a line from the current point to the given end-point. The value of the current point is set to the given end-point.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="x">The horizontal coordinate of the end-point of the line.</param>
@@ -411,7 +438,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_line_to(PaintHandle paint, float x, float y);
 
     /// <summary>
-    /// The Bezier curve starts at the current point and ends at the given end-point (@p x, @p y). Two control points (@p cx1, @p cy1) and (@p cx2, @p cy2) are used to determine the shape of the curve. The value of the current point is set to the given end-point.
+    /// Adds new points to the sub-path, which results in drawing a cubic Bezier curve. The Bezier curve starts at the current point and ends at the given end-point (@p x, @p y). Two control points (@p cx1, @p cy1) and (@p cx2, @p cy2) are used to determine the shape of the curve. The value of the current point is set to the given end-point.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="cx1">The horizontal coordinate of the 1st control point.</param>
@@ -425,7 +452,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_cubic_to(PaintHandle paint, float cx1, float cy1, float cx2, float cy2, float x, float y);
 
     /// <summary>
-    /// The value of the current point is set to the initial point of the closed sub-path.
+    /// Closes the current sub-path by drawing a line from the current point to the initial point of the sub-path. The value of the current point is set to the initial point of the closed sub-path.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -433,7 +460,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_close(PaintHandle paint);
 
     /// <summary>
-    /// The rectangle with rounded corners can be achieved by setting non-zero values to @p rx and @p ry arguments. The @p rx and @p ry values specify the radii of the ellipse defining the rounding of the corners. The position of the rectangle is specified by the coordinates of its upper-left corner -  @p x and @p y arguments. The rectangle is treated as a new sub-path - it is not connected with the previous sub-path. The value of the current point is set to (@p x + @p rx, @p y) - in case @p rx is greater than @p w/2 the current point is set to (@p x + @p w/2, @p y)
+    /// Appends a rectangle to the path. The rectangle with rounded corners can be achieved by setting non-zero values to @p rx and @p ry arguments. The @p rx and @p ry values specify the radii of the ellipse defining the rounding of the corners. The position of the rectangle is specified by the coordinates of its upper-left corner -  @p x and @p y arguments. The rectangle is treated as a new sub-path - it is not connected with the previous sub-path. The value of the current point is set to (@p x + @p rx, @p y) - in case @p rx is greater than @p w/2 the current point is set to (@p x + @p w/2, @p y)
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="x">The horizontal coordinate of the upper-left corner of the rectangle.</param>
@@ -448,7 +475,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_append_rect(PaintHandle paint, float x, float y, float w, float h, float rx, float ry, [MarshalAs(UnmanagedType.I1)] bool cw);
 
     /// <summary>
-    /// The position of the ellipse is specified by the coordinates of its center - @p cx and @p cy arguments. The ellipse is treated as a new sub-path - it is not connected with the previous sub-path. The value of the current point is set to (@p cx, @p cy - @p ry).
+    /// Appends an ellipse to the path. The position of the ellipse is specified by the coordinates of its center - @p cx and @p cy arguments. The ellipse is treated as a new sub-path - it is not connected with the previous sub-path. The value of the current point is set to (@p cx, @p cy - @p ry).
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="cx">The horizontal coordinate of the center of the ellipse.</param>
@@ -461,7 +488,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_append_circle(PaintHandle paint, float cx, float cy, float rx, float ry, [MarshalAs(UnmanagedType.I1)] bool cw);
 
     /// <summary>
-    /// The current point value is set to the last point from the sub-path. For each command from the @p cmds array, an appropriate number of points in @p pts array should be specified. If the number of points in the @p pts array is different than the number required by the @p cmds array, the shape with this sub-path will not be displayed on the screen.
+    /// Appends a given sub-path to the path. The current point value is set to the last point from the sub-path. For each command from the @p cmds array, an appropriate number of points in @p pts array should be specified. If the number of points in the @p pts array is different than the number required by the @p cmds array, the shape with this sub-path will not be displayed on the screen.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="cmds">The array of the commands in the sub-path.</param>
@@ -473,7 +500,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_append_path(PaintHandle paint, in byte cmds, uint cmdCnt, in Point pts, uint ptsCnt);
 
     /// <summary>
-    /// This function provides access to the shape's path data, including the commands and points that define the path. Can be @c nullptr if this information is not needed. Can be @c nullptr if this information is not needed. Can be @c nullptr if this information is not needed. Can be @c nullptr if this information is not needed.
+    /// Retrieves the current path data of the shape. This function provides access to the shape's path data, including the commands and points that define the path. Can be @c nullptr if this information is not needed. Can be @c nullptr if this information is not needed. Can be @c nullptr if this information is not needed. Can be @c nullptr if this information is not needed.
     /// </summary>
     /// <param name="cmds">Pointer to the array of commands representing the path.</param>
     /// <param name="cmdsCnt">Pointer to the variable that receives the number of commands in the @p cmds array.</param>
@@ -484,7 +511,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_get_path(PaintHandle paint, out nint cmds, out uint cmdsCnt, out nint pts, out uint ptsCnt);
 
     /// <summary>
-    /// This function defines the thickness of the stroke applied to all figures in the path object. A stroke is the outline drawn along the edges of the path's geometry.
+    /// Sets the stroke width for the path. This function defines the thickness of the stroke applied to all figures in the path object. A stroke is the outline drawn along the edges of the path's geometry.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="width">The width of the stroke in pixels. Must be positive value. (The default is 0)</param>
@@ -492,12 +519,18 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_set_stroke_width(PaintHandle paint, float width);
 
+    /// <summary>
+    /// Gets the shape's stroke width.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="width">The stroke width.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_get_stroke_width(PaintHandle paint, out float width);
 
+    /// <summary>
+    /// Sets the shape's stroke color.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="r">The red color channel value in the range [0 ~ 255]. The default value is 0.</param>
     /// <param name="g">The green color channel value in the range [0 ~ 255]. The default value is 0.</param>
@@ -507,6 +540,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_set_stroke_color(PaintHandle paint, byte r, byte g, byte b, byte a);
 
+    /// <summary>
+    /// Gets the shape's stroke color.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="r">The red color channel value in the range [0 ~ 255]. The default value is 0.</param>
     /// <param name="g">The green color channel value in the range [0 ~ 255]. The default value is 0.</param>
@@ -516,6 +552,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_get_stroke_color(PaintHandle paint, out byte r, out byte g, out byte b, out byte a);
 
+    /// <summary>
+    /// Sets the gradient fill of the stroke for all of the figures from the path.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="grad">The gradient fill.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -523,7 +562,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_set_stroke_gradient(PaintHandle paint, GradientHandle grad);
 
     /// <summary>
-    /// The function does not allocate any memory.
+    /// Gets the gradient fill of the shape's stroke. The function does not allocate any memory.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="grad">The gradient fill.</param>
@@ -532,7 +571,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_get_stroke_gradient(PaintHandle paint, out GradientHandle grad);
 
     /// <summary>
-    /// order to form an even-length pattern, preserving the alternation of dashes and gaps.
+    /// Sets the shape's stroke dash pattern. order to form an even-length pattern, preserving the alternation of dashes and gaps.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="dashPattern">An array of alternating dash and gap lengths.</param>
@@ -543,7 +582,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_set_stroke_dash(PaintHandle paint, nint dashPattern, uint cnt, float offset);
 
     /// <summary>
-    /// The function does not allocate any memory.
+    /// Gets the dash pattern of the stroke. The function does not allocate any memory.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="dashPattern">The array of consecutive pair values of the dash length and the gap length.</param>
@@ -554,7 +593,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_get_stroke_dash(PaintHandle paint, out nint dashPattern, out uint cnt, out float offset);
 
     /// <summary>
-    /// The cap style specifies the shape to be used at the end of the open stroked sub-paths.
+    /// Sets the cap style used for stroking the path. The cap style specifies the shape to be used at the end of the open stroked sub-paths.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="cap">The cap style value. The default value is @c TVG_STROKE_CAP_SQUARE.</param>
@@ -562,30 +601,45 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_set_stroke_cap(PaintHandle paint, StrokeCap cap);
 
+    /// <summary>
+    /// Gets the stroke cap style used for stroking the path.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="cap">The cap style value.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_get_stroke_cap(PaintHandle paint, out StrokeCap cap);
 
+    /// <summary>
+    /// Sets the join style for stroked path segments.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="join">The join style value. The default value is @c TVG_STROKE_JOIN_BEVEL.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_set_stroke_join(PaintHandle paint, StrokeJoin join);
 
+    /// <summary>
+    /// The function gets the stroke join method
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="join">The join style value.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_get_stroke_join(PaintHandle paint, out StrokeJoin join);
 
+    /// <summary>
+    /// Sets the stroke miterlimit.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="miterlimit">The miterlimit imposes a limit on the extent of the stroke join when the @c TVG_STROKE_JOIN_MITER join style is set. The default value is 4.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_set_stroke_miterlimit(PaintHandle paint, float miterlimit);
 
+    /// <summary>
+    /// The function gets the stroke miterlimit.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="miterlimit">The stroke miterlimit.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -593,7 +647,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_get_stroke_miterlimit(PaintHandle paint, out float miterlimit);
 
     /// <summary>
-    /// If the values of the arguments @p begin and @p end exceed the 0-1 range, they are wrapped around in a manner similar to angle wrapping, effectively treating the range as circular. Otherwise, all paths are treated as a single entity with a combined length equal to the sum of their individual lengths and are trimmed as such.
+    /// Sets the trim of the shape along the defined path segment, allowing control over which part of the shape is visible. If the values of the arguments @p begin and @p end exceed the 0-1 range, they are wrapped around in a manner similar to angle wrapping, effectively treating the range as circular. Otherwise, all paths are treated as a single entity with a combined length equal to the sum of their individual lengths and are trimmed as such.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="begin">Specifies the start of the segment to display along the path.</param>
@@ -604,7 +658,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_set_trimpath(PaintHandle paint, float begin, float end, [MarshalAs(UnmanagedType.I1)] bool simultaneous);
 
     /// <summary>
-    /// The parts of the shape defined as inner are colored.
+    /// Sets the shape's solid color. The parts of the shape defined as inner are colored.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="r">The red color channel value in the range [0 ~ 255]. The default value is 0.</param>
@@ -615,6 +669,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_set_fill_color(PaintHandle paint, byte r, byte g, byte b, byte a);
 
+    /// <summary>
+    /// Gets the shape's solid color.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="r">The red color channel value in the range [0 ~ 255]. The default value is 0.</param>
     /// <param name="g">The green color channel value in the range [0 ~ 255]. The default value is 0.</param>
@@ -625,7 +682,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_get_fill_color(PaintHandle paint, out byte r, out byte g, out byte b, out byte a);
 
     /// <summary>
-    /// Specifies how the interior of the shape is determined when its path intersects itself. The default fill rule is @c TVG_FILL_RULE_NON_ZERO.
+    /// Sets the fill rule for the shape. Specifies how the interior of the shape is determined when its path intersects itself. The default fill rule is @c TVG_FILL_RULE_NON_ZERO.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="rule">The fill rule to apply to the shape.</param>
@@ -634,7 +691,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_set_fill_rule(PaintHandle paint, FillRule rule);
 
     /// <summary>
-    /// This function returns the fill rule, which determines how the interior regions of the shape are calculated when it overlaps itself.
+    /// Retrieves the current fill rule used by the shape. This function returns the fill rule, which determines how the interior regions of the shape are calculated when it overlaps itself.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="rule">The current Tvg_Fill_Rule value of the shape.</param>
@@ -642,6 +699,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_get_fill_rule(PaintHandle paint, out FillRule rule);
 
+    /// <summary>
+    /// Sets the rendering order of the stroke and the fill.
+    /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="strokeFirst">If @c true the stroke is rendered before the fill, otherwise the stroke is rendered as the second one (the default option).</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -649,7 +709,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_set_paint_order(PaintHandle paint, [MarshalAs(UnmanagedType.I1)] bool strokeFirst);
 
     /// <summary>
-    /// The parts of the shape defined as inner are filled.
+    /// Sets the gradient fill for all of the figures from the path. The parts of the shape defined as inner are filled.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="grad">The gradient fill.</param>
@@ -658,7 +718,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_shape_set_gradient(PaintHandle paint, GradientHandle grad);
 
     /// <summary>
-    /// The function does not allocate any data.
+    /// Gets the gradient fill of the shape. The function does not allocate any data.
     /// </summary>
     /// <param name="paint">A Tvg_Paint pointer to the shape object.</param>
     /// <param name="grad">The gradient fill.</param>
@@ -666,18 +726,24 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_shape_get_gradient(PaintHandle paint, out GradientHandle grad);
 
+    /// <summary>
+    /// Creates a new linear gradient object.
+    /// </summary>
     /// <returns>A new linear gradient object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial GradientHandle tvg_linear_gradient_new();
 
+    /// <summary>
+    /// Creates a new radial gradient object.
+    /// </summary>
     /// <returns>A new radial gradient object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial GradientHandle tvg_radial_gradient_new();
 
     /// <summary>
-    /// The bounds of the linear gradient are defined as a surface constrained by two parallel lines crossing the given points (@p x1, @p y1) and (@p x2, @p y2), respectively. Both lines are perpendicular to the line linking (@p x1, @p y1) and (@p x2, @p y2).
+    /// Sets the linear gradient bounds. The bounds of the linear gradient are defined as a surface constrained by two parallel lines crossing the given points (@p x1, @p y1) and (@p x2, @p y2), respectively. Both lines are perpendicular to the line linking (@p x1, @p y1) and (@p x2, @p y2).
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which bounds are to be set.</param>
     /// <param name="x1">The horizontal coordinate of the first point used to determine the gradient bounds.</param>
@@ -689,7 +755,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_linear_gradient_set(GradientHandle grad, float x1, float y1, float x2, float y2);
 
     /// <summary>
-    /// The bounds of the linear gradient are defined as a surface constrained by two parallel lines crossing the given points (@p x1, @p y1) and (@p x2, @p y2), respectively. Both lines are perpendicular to the line linking (@p x1, @p y1) and (@p x2, @p y2).
+    /// Gets the linear gradient bounds. The bounds of the linear gradient are defined as a surface constrained by two parallel lines crossing the given points (@p x1, @p y1) and (@p x2, @p y2), respectively. Both lines are perpendicular to the line linking (@p x1, @p y1) and (@p x2, @p y2).
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which to get the bounds.</param>
     /// <param name="x1">The horizontal coordinate of the first point used to determine the gradient bounds.</param>
@@ -701,7 +767,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_linear_gradient_get(GradientHandle grad, out float x1, out float y1, out float x2, out float y2);
 
     /// <summary>
-    /// The radial gradient is defined by the end circle with a center (@p cx, @p cy) and a radius @p r and the start circle with a center/focal point (@p fx, @p fy) and a radius @p fr. The gradient will be rendered such that the gradient stop at an offset of 100% aligns with the edge of the end circle and the stop at an offset of 0% aligns with the edge of the start circle. the gradient focus towards a specific edge or enhancing the depth and complexity of shading patterns. If a focal effect is not desired, simply align the focal point (@p fx and @p fy) with the center of the end circle (@p cx and @p cy) and set the radius (@p fr) to zero. This will result in a uniform gradient without any focal variations.
+    /// Sets the radial gradient attributes. The radial gradient is defined by the end circle with a center (@p cx, @p cy) and a radius @p r and the start circle with a center/focal point (@p fx, @p fy) and a radius @p fr. The gradient will be rendered such that the gradient stop at an offset of 100% aligns with the edge of the end circle and the stop at an offset of 0% aligns with the edge of the start circle. the gradient focus towards a specific edge or enhancing the depth and complexity of shading patterns. If a focal effect is not desired, simply align the focal point (@p fx and @p fy) with the center of the end circle (@p cx and @p cy) and set the radius (@p fr) to zero. This will result in a uniform gradient without any focal variations.
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which bounds are to be set.</param>
     /// <param name="cx">The horizontal coordinate of the center of the end circle.</param>
@@ -714,6 +780,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_radial_gradient_set(GradientHandle grad, float cx, float cy, float r, float fx, float fy, float fr);
 
+    /// <summary>
+    /// The function gets radial gradient attributes.
+    /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which to get the gradient attributes.</param>
     /// <param name="cx">The horizontal coordinate of the center of the end circle.</param>
     /// <param name="cy">The vertical coordinate of the center of the end circle.</param>
@@ -725,6 +794,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_radial_gradient_get(GradientHandle grad, out float cx, out float cy, out float r, out float fx, out float fy, out float fr);
 
+    /// <summary>
+    /// Sets the parameters of the colors of the gradient and their position.
+    /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which the color information is to be set.</param>
     /// <param name="color_stop">An array of Tvg_Color_Stop data structure.</param>
     /// <param name="cnt">The size of the @p color_stop array equal to the colors number used in the gradient.</param>
@@ -733,7 +805,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_gradient_set_color_stops(GradientHandle grad, in ColorStop color_stop, uint cnt);
 
     /// <summary>
-    /// The function does not allocate any memory.
+    /// Gets the parameters of the colors of the gradient, their position and number The function does not allocate any memory.
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which to get the color information.</param>
     /// <param name="color_stop">An array of Tvg_Color_Stop data structure.</param>
@@ -742,12 +814,18 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_gradient_get_color_stops(GradientHandle grad, out nint color_stop, out uint cnt);
 
+    /// <summary>
+    /// Sets the Tvg_Stroke_Fill value, which specifies how to fill the area outside the gradient bounds.
+    /// </summary>
     /// <param name="grad">The Tvg_Gradient object.</param>
     /// <param name="spread">The FillSpread value.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_gradient_set_spread(GradientHandle grad, StrokeFill spread);
 
+    /// <summary>
+    /// Gets the FillSpread value of the gradient object.
+    /// </summary>
     /// <param name="grad">The Tvg_Gradient object.</param>
     /// <param name="spread">The FillSpread value.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -755,7 +833,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_gradient_get_spread(GradientHandle grad, out StrokeFill spread);
 
     /// <summary>
-    /// The augmented matrix of the transformation is expected to be given.
+    /// Sets the matrix of the affine transformation for the gradient object. The augmented matrix of the transformation is expected to be given.
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object to be transformed.</param>
     /// <param name="m">The 3x3 augmented matrix.</param>
@@ -764,7 +842,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_gradient_set_transform(GradientHandle grad, in Matrix m);
 
     /// <summary>
-    /// In case no transformation was applied, the identity matrix is set.
+    /// Gets the matrix of the affine transformation of the gradient object. In case no transformation was applied, the identity matrix is set.
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which to get the transformation matrix.</param>
     /// <param name="m">The 3x3 augmented matrix.</param>
@@ -772,6 +850,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_gradient_get_transform(GradientHandle grad, out Matrix m);
 
+    /// <summary>
+    /// Gets the unique value of the gradient instance indicating the instance type.
+    /// </summary>
     /// <param name="grad">The Tvg_Gradient object of which to get the type value.</param>
     /// <param name="type">The unique type of the gradient instance type.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -779,7 +860,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_gradient_get_type(GradientHandle grad, out Type type);
 
     /// <summary>
-    /// Creates a new object and sets its all properties as in the original object.
+    /// Duplicates the given Tvg_Gradient object. Creates a new object and sets its all properties as in the original object.
     /// </summary>
     /// <param name="grad">The Tvg_Gradient object to be copied.</param>
     /// <returns>A copied Tvg_Gradient object if succeed, @c nullptr otherwise.</returns>
@@ -787,13 +868,16 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial GradientHandle tvg_gradient_duplicate(GradientHandle grad);
 
+    /// <summary>
+    /// Deletes the given gradient object.
+    /// </summary>
     /// <param name="grad">The gradient object to be deleted.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_gradient_del(GradientHandle grad);
 
     /// <summary>
-    /// This function allocates and returns a new Picture instance. To properly destroy the Picture object, use @ref tvg_paint_rel().
+    /// Creates a new Picture object. This function allocates and returns a new Picture instance. To properly destroy the Picture object, use @ref tvg_paint_rel().
     /// </summary>
     /// <returns>A pointer to the newly created Picture object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -801,7 +885,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_picture_new();
 
     /// <summary>
-    /// ThorVG efficiently caches the loaded data using the specified @p path as a key. This means that loading the same file again will not result in duplicate operations; instead, ThorVG will reuse the previously loaded picture data.
+    /// Loads a picture data directly from a file. ThorVG efficiently caches the loaded data using the specified @p path as a key. This means that loading the same file again will not result in duplicate operations; instead, ThorVG will reuse the previously loaded picture data.
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="path">The absolute path to the image file.</param>
@@ -810,7 +894,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_load(PaintHandle picture, [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
     /// <summary>
-    /// ThorVG efficiently caches the loaded data, using the provided @p data address as a key when @p copy is set to @c false. This allows ThorVG to avoid redundant operations by reusing the previously loaded picture data for the same sharable @p data, rather than duplicating the load process.
+    /// Loads raw image data in a specific format from a memory block of the given size. ThorVG efficiently caches the loaded data, using the provided @p data address as a key when @p copy is set to @c false. This allows ThorVG to avoid redundant operations by reusing the previously loaded picture data for the same sharable @p data, rather than duplicating the load process.
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="data">A pointer to the memory block where the raw image data is stored.</param>
@@ -823,7 +907,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_load_raw(PaintHandle picture, nint data, uint w, uint h, Colorspace cs, [MarshalAs(UnmanagedType.I1)] bool copy);
 
     /// <summary>
-    /// ThorVG efficiently caches the loaded data using the specified @p data address as a key when the @p copy has @c false. This means that loading the same data again will not result in duplicate operations for the sharable @p data. Instead, ThorVG will reuse the previously loaded picture data.
+    /// Loads a picture data from a memory block of a given size. ThorVG efficiently caches the loaded data using the specified @p data address as a key when the @p copy has @c false. This means that loading the same data again will not result in duplicate operations for the sharable @p data. Instead, ThorVG will reuse the previously loaded picture data.
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="data">A pointer to a memory location where the content of the picture file is stored. A null-terminated string is expected for non-binary data if @p copy is @c false</param>
@@ -836,7 +920,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_load_data(PaintHandle picture, [In] byte[] data, uint size, [MarshalAs(UnmanagedType.LPUTF8Str)] string mimetype, [MarshalAs(UnmanagedType.LPUTF8Str)] string rpath, [MarshalAs(UnmanagedType.I1)] bool copy);
 
     /// <summary>
-    /// This callback is invoked when an external asset reference (such as an image source or file path) is encountered in a Picture object. It allows the user to provide a custom mechanism for loading or substituting assets, such as loading from an external source or a virtual filesystem. The function should return @c true if the asset was successfully resolved by the user, or @c false if it was not. This can be used to maintain context or access external resources. Setting the resolver after loading will have no effect on asset resolution for that asset.
+    /// Sets the asset resolver callback for handling external resources (e.g., images and fonts). This callback is invoked when an external asset reference (such as an image source or file path) is encountered in a Picture object. It allows the user to provide a custom mechanism for loading or substituting assets, such as loading from an external source or a virtual filesystem. The function should return @c true if the asset was successfully resolved by the user, or @c false if it was not. This can be used to maintain context or access external resources. Setting the resolver after loading will have no effect on asset resolution for that asset.
     /// </summary>
     /// <param name="resolver">A user-defined function that handles the resolution of asset paths.</param>
     /// <param name="data">A pointer to user-defined data that will be passed to the callback each time it is invoked.</param>
@@ -845,7 +929,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_set_asset_resolver(PaintHandle picture, nint resolver, nint data);
 
     /// <summary>
-    /// The picture content is resized while keeping the default size aspect ratio. The scaling factor is established for each of dimensions and the smaller value is applied to both of them.
+    /// Resizes the picture content to the given width and height. The picture content is resized while keeping the default size aspect ratio. The scaling factor is established for each of dimensions and the smaller value is applied to both of them.
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="w">A new width of the image in pixels.</param>
@@ -854,6 +938,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_picture_set_size(PaintHandle picture, float w, float h);
 
+    /// <summary>
+    /// Gets the size of the loaded picture.
+    /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="w">A width of the image in pixels.</param>
     /// <param name="h">A height of the image in pixels.</param>
@@ -862,7 +949,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_get_size(PaintHandle picture, out float w, out float h);
 
     /// <summary>
-    /// This method defines the origin point of the Picture using normalized coordinates. Unlike a typical pivot point used only for transformations, this origin affects both the transformation behavior and the actual rendering position of the Picture. The specified origin becomes the reference point for positioning the Picture on the canvas. For example, setting the origin to (0.5f, 0.5f) moves the visual center of the picture to the position specified by Paint::translate(). The coordinates are given in a normalized range relative to the picture's bounds: - (0.0f, 0.0f): top-left corner - (0.5f, 0.5f): center - (1.0f, 1.0f): bottom-right corner transformations such as translate(), rotate(), or scale().
+    /// Sets the normalized origin point of the Picture object. This method defines the origin point of the Picture using normalized coordinates. Unlike a typical pivot point used only for transformations, this origin affects both the transformation behavior and the actual rendering position of the Picture. The specified origin becomes the reference point for positioning the Picture on the canvas. For example, setting the origin to (0.5f, 0.5f) moves the visual center of the picture to the position specified by Paint::translate(). The coordinates are given in a normalized range relative to the picture's bounds: - (0.0f, 0.0f): top-left corner - (0.5f, 0.5f): center - (1.0f, 1.0f): bottom-right corner transformations such as translate(), rotate(), or scale().
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="x">The normalized x-coordinate of the origin point (range: 0.0f to 1.0f).</param>
@@ -872,7 +959,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_set_origin(PaintHandle picture, float x, float y);
 
     /// <summary>
-    /// This method retrieves the current origin point of the Picture, expressed in normalized coordinates relative to the picture’s bounds.
+    /// Gets the normalized origin point of the Picture object. This method retrieves the current origin point of the Picture, expressed in normalized coordinates relative to the picture’s bounds.
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="x">The normalized x-coordinate of the origin (range: 0.0f to 1.0f).</param>
@@ -882,7 +969,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_picture_get_origin(PaintHandle picture, out float x, out float y);
 
     /// <summary>
-    /// This function searches for a paint object within the Picture scene that matches the provided @p id.
+    /// Retrieve a paint object from the Picture scene by its Unique ID. This function searches for a paint object within the Picture scene that matches the provided @p id.
     /// </summary>
     /// <param name="picture">A Tvg_Paint pointer to the picture object.</param>
     /// <param name="id">The Unique ID of the paint object.</param>
@@ -892,7 +979,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_picture_get_paint(PaintHandle picture, uint id);
 
     /// <summary>
-    /// This function allocates and returns a new Scene instance. To properly destroy the Scene object, use @ref tvg_paint_rel().
+    /// Creates a new Scene object. This function allocates and returns a new Scene instance. To properly destroy the Scene object, use @ref tvg_paint_rel().
     /// </summary>
     /// <returns>A pointer to the newly created Scene object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -900,7 +987,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_scene_new();
 
     /// <summary>
-    /// Appends the specified paint object to the given scene. Only paint objects added to the scene are considered rendering targets. This parameter must not be @c nullptr. This parameter must not be @c nullptr. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the scene. scene. If layering is required, ensure the paints are added in the desired order.
+    /// Adds a paint object to the scene. Appends the specified paint object to the given scene. Only paint objects added to the scene are considered rendering targets. This parameter must not be @c nullptr. This parameter must not be @c nullptr. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the scene. scene. If layering is required, ensure the paints are added in the desired order.
     /// </summary>
     /// <param name="scene">A handle to the scene object.</param>
     /// <param name="paint">A handle to the paint object to be added to the scene.</param>
@@ -909,7 +996,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_add(PaintHandle scene, PaintHandle paint);
 
     /// <summary>
-    /// Inserts the specified paint object into the scene immediately before the given paint object @p at. The @p at parameter must reference an existing paint object already added to the scene. This parameter must not be @c nullptr. This parameter must not be @c nullptr. which @p target will be inserted. This parameter must not be @c nullptr. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the scene. scene. If layering is required, ensure the paints are added in the desired order.
+    /// Inserts a paint object into the scene. Inserts the specified paint object into the scene immediately before the given paint object @p at. The @p at parameter must reference an existing paint object already added to the scene. This parameter must not be @c nullptr. This parameter must not be @c nullptr. which @p target will be inserted. This parameter must not be @c nullptr. successful addition. To retain ownership, call @ref tvg_paint_ref() before adding it to the scene. scene. If layering is required, ensure the paints are added in the desired order.
     /// </summary>
     /// <param name="scene">A handle to the scene object.</param>
     /// <param name="target">A handle to the paint object to be inserted into the scene.</param>
@@ -919,7 +1006,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_insert(PaintHandle scene, PaintHandle target, PaintHandle at);
 
     /// <summary>
-    /// This function removes a specified paint object from the scene. If no paint object is specified (i.e., the default @c nullptr is used), the function performs to clear all paints from the scene. If @c nullptr, remove all the paints from the scene.
+    /// Removes a paint object from the scene. This function removes a specified paint object from the scene. If no paint object is specified (i.e., the default @c nullptr is used), the function performs to clear all paints from the scene. If @c nullptr, remove all the paints from the scene.
     /// </summary>
     /// <param name="scene">A Tvg_Paint pointer to the scene object.</param>
     /// <param name="paint">A pointer to the Paint object to be removed from the scene.</param>
@@ -928,7 +1015,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_remove(PaintHandle scene, PaintHandle paint);
 
     /// <summary>
-    /// This function clears all effects that have been applied to the scene, restoring it to its original state without any post-processing.
+    /// Clears all previously applied scene effects. This function clears all effects that have been applied to the scene, restoring it to its original state without any post-processing.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -936,7 +1023,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_clear_effects(PaintHandle scene);
 
     /// <summary>
-    /// This function adds a Gaussian blur filter to the scene as a post-processing effect. The blur can be applied in different directions with configurable border handling and quality settings.
+    /// Adds a Gaussian blur effect to the scene. This function adds a Gaussian blur filter to the scene as a post-processing effect. The blur can be applied in different directions with configurable border handling and quality settings.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="sigma">The blur radius (sigma) value. Must be greater than 0.</param>
@@ -948,7 +1035,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_add_effect_gaussian_blur(PaintHandle scene, double sigma, int direction, int border, int quality);
 
     /// <summary>
-    /// This function adds a drop shadow with a Gaussian blur to the scene. The shadow can be customized using color, opacity, angle, distance, blur radius (sigma), and quality parameters.
+    /// Adds a drop shadow effect to the scene. This function adds a drop shadow with a Gaussian blur to the scene. The shadow can be customized using color, opacity, angle, distance, blur radius (sigma), and quality parameters.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="r">Red channel value of the shadow color [0 - 255].</param>
@@ -964,7 +1051,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_add_effect_drop_shadow(PaintHandle scene, int r, int g, int b, int a, double angle, double distance, double sigma, int quality);
 
     /// <summary>
-    /// This function overrides the scene's content colors with the specified fill color.
+    /// Adds a fill color effect to the scene. This function overrides the scene's content colors with the specified fill color.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="r">Red color channel value [0 - 255].</param>
@@ -976,7 +1063,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_add_effect_fill(PaintHandle scene, int r, int g, int b, int a);
 
     /// <summary>
-    /// This function tints the current scene using specified black and white color values, modulated by a given intensity.
+    /// Adds a tint effect to the scene. This function tints the current scene using specified black and white color values, modulated by a given intensity.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="black_r">Red component of the black color [0 - 255].</param>
@@ -991,7 +1078,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_add_effect_tint(PaintHandle scene, int black_r, int black_g, int black_b, int white_r, int white_g, int white_b, double intensity);
 
     /// <summary>
-    /// This function adds a tritone color effect to the given scene using three sets of RGB values representing shadow, midtone, and highlight colors.
+    /// Adds a tritone color effect to the scene. This function adds a tritone color effect to the given scene using three sets of RGB values representing shadow, midtone, and highlight colors.
     /// </summary>
     /// <param name="scene">A pointer to the Tvg_Paint scene object.</param>
     /// <param name="shadow_r">Red component of the shadow color [0 - 255].</param>
@@ -1009,7 +1096,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_scene_add_effect_tritone(PaintHandle scene, int shadow_r, int shadow_g, int shadow_b, int midtone_r, int midtone_g, int midtone_b, int highlight_r, int highlight_g, int highlight_b, int blend);
 
     /// <summary>
-    /// This function allocates and returns a new Text instance. To properly destroy the Text object, use @ref tvg_paint_rel().
+    /// Creates a new Text object. This function allocates and returns a new Text instance. To properly destroy the Text object, use @ref tvg_paint_rel().
     /// </summary>
     /// <returns>A pointer to the newly created Text object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -1017,7 +1104,7 @@ internal static partial class ThorVGNative
     internal static partial PaintHandle tvg_text_new();
 
     /// <summary>
-    /// This function specifies the name of the font to be used when rendering text. If set to @c nullptr, ThorVG will attempt to select a fallback font available on the engine.
+    /// Sets the font family for the text. This function specifies the name of the font to be used when rendering text. If set to @c nullptr, ThorVG will attempt to select a fallback font available on the engine.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="name">The name of the font. This should match a font available through the canvas backend.</param>
@@ -1026,7 +1113,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_set_font(PaintHandle text, [MarshalAs(UnmanagedType.LPUTF8Str)] string name);
 
     /// <summary>
-    /// This function sets the font size used during text rendering. The size is specified in point units, and supports floating-point precision for smooth scaling and animation effects.
+    /// Sets the font size for the text. This function sets the font size used during text rendering. The size is specified in point units, and supports floating-point precision for smooth scaling and animation effects.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="size">The font size in points. Must be greater than 0.0.</param>
@@ -1035,7 +1122,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_set_size(PaintHandle text, float size);
 
     /// <summary>
-    /// This function sets the unicode text that will be displayed by the rendering system. The text is set according to the specified UTF encoding method, which defaults to UTF-8.
+    /// Assigns the given unicode text to be rendered. This function sets the unicode text that will be displayed by the rendering system. The text is set according to the specified UTF encoding method, which defaults to UTF-8.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="utf8">The multi-byte text encoded with utf8 string to be rendered.</param>
@@ -1044,7 +1131,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_set_text(PaintHandle text, [MarshalAs(UnmanagedType.LPUTF8Str)] string utf8);
 
     /// <summary>
-    /// If layout width/height is set on an axis, align within the layout box. Otherwise, treat it as an anchor within the text bounds which point of the text box is pinned to the paint position.
+    /// Sets text alignment or anchor per axis. If layout width/height is set on an axis, align within the layout box. Otherwise, treat it as an anchor within the text bounds which point of the text box is pinned to the paint position.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="x">Horizontal alignment/anchor in [0..1]: 0=left/start, 0.5=center, 1=right/end. (Default is 0)</param>
@@ -1054,7 +1141,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_align(PaintHandle text, float x, float y);
 
     /// <summary>
-    /// If width/height is set on an axis, that axis is constrained by a virtual layout box and the text may wrap/align inside it. If width/height == 0, the axis is unconstrained and @ref tvg_text_align() acts as an anchor on that axis.
+    /// Sets the virtual layout box (constraints) for the text. If width/height is set on an axis, that axis is constrained by a virtual layout box and the text may wrap/align inside it. If width/height == 0, the axis is unconstrained and @ref tvg_text_align() acts as an anchor on that axis.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="w">Layout width in user space. Use 0 for no horizontal constraint. (Default is 0)</param>
@@ -1064,7 +1151,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_layout(PaintHandle text, float w, float h);
 
     /// <summary>
-    /// This method controls how the text is laid out when it exceeds the available space. The wrapping mode determines whether text is truncated, wrapped by character or word, or adjusted automatically. An ellipsis mode is also available for truncation with "...".
+    /// Sets the text wrapping mode for this text object. This method controls how the text is laid out when it exceeds the available space. The wrapping mode determines whether text is truncated, wrapped by character or word, or adjusted automatically. An ellipsis mode is also available for truncation with "...".
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="mode">The wrapping strategy to apply. Default is @c TVG_TEXT_WRAP_NONE.</param>
@@ -1073,7 +1160,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_wrap_mode(PaintHandle text, TextWrap mode);
 
     /// <summary>
-    /// This function adjusts the letter spacing (horizontal space between glyphs) and line spacing (vertical space between lines of text) using scale factors. Both values are relative to the font's default metrics: - The letter spacing is applied as a scale factor to the glyph's advance width. - The line spacing is applied as a scale factor to the glyph's advance height. Values > 1.0 increase spacing, values &lt; 1.0 decrease it. Must be greater than or equal to 0.0. (default: 1.0) Values > 1.0 increase line spacing, values &lt; 1.0 decrease it. Must be greater than or equal to 0.0. (default: 1.0)
+    /// Set the spacing scale factors for text layout. This function adjusts the letter spacing (horizontal space between glyphs) and line spacing (vertical space between lines of text) using scale factors. Both values are relative to the font's default metrics: - The letter spacing is applied as a scale factor to the glyph's advance width. - The line spacing is applied as a scale factor to the glyph's advance height. Values > 1.0 increase spacing, values &lt; 1.0 decrease it. Must be greater than or equal to 0.0. (default: 1.0) Values > 1.0 increase line spacing, values &lt; 1.0 decrease it. Must be greater than or equal to 0.0. (default: 1.0)
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="letter">The scale factor for letter spacing.</param>
@@ -1083,7 +1170,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_spacing(PaintHandle text, float letter, float line);
 
     /// <summary>
-    /// This function applies a shear transformation to simulate an italic (oblique) style for the current text object. The shear factor determines the degree of slant applied along the X-axis. Must be in the range [0.0, 0.5]. Recommended value is 0.18. It visually simulates the effect by applying a transformation matrix.
+    /// Apply an italic (slant) transformation to the text. This function applies a shear transformation to simulate an italic (oblique) style for the current text object. The shear factor determines the degree of slant applied along the X-axis. Must be in the range [0.0, 0.5]. Recommended value is 0.18. It visually simulates the effect by applying a transformation matrix.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="shear">The shear factor to apply. A value of 0.0 applies no slant, while values around 0.5 result in a strong slant.</param>
@@ -1092,7 +1179,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_text_set_italic(PaintHandle text, float shear);
 
     /// <summary>
-    /// This function adds an outline to the text with the specified width and RGB color. The outline enhances the visibility of the text by rendering a stroke around its glyphs.
+    /// Sets an outline (stroke) around the text object. This function adds an outline to the text with the specified width and RGB color. The outline enhances the visibility of the text by rendering a stroke around its glyphs.
     /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     /// <param name="width">The width of the outline. Must be positive value. (The default is 0)</param>
@@ -1103,6 +1190,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_text_set_outline(PaintHandle text, float width, byte r, byte g, byte b);
 
+    /// <summary>
+    /// Sets the text solid color.
+    /// </summary>
     /// <param name="r">The red color channel value in the range [0 ~ 255]. The default value is 0.</param>
     /// <param name="g">The green color channel value in the range [0 ~ 255]. The default value is 0.</param>
     /// <param name="b">The blue color channel value in the range [0 ~ 255]. The default value is 0.</param>
@@ -1110,13 +1200,16 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_text_set_color(PaintHandle text, byte r, byte g, byte b);
 
+    /// <summary>
+    /// Sets the gradient fill for the text.
+    /// </summary>
     /// <param name="text">A Tvg_Paint pointer to the text object.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_text_set_gradient(PaintHandle text, GradientHandle gradient);
 
     /// <summary>
-    /// ThorVG efficiently caches the loaded data using the specified @p path as a key. This means that loading the same file again will not result in duplicate operations; instead, ThorVG will reuse the previously loaded font data.
+    /// Loads a scalable font data from a file. ThorVG efficiently caches the loaded data using the specified @p path as a key. This means that loading the same file again will not result in duplicate operations; instead, ThorVG will reuse the previously loaded font data.
     /// </summary>
     /// <param name="path">The path to the font file.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -1124,7 +1217,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_font_load([MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
     /// <summary>
-    /// ThorVG efficiently caches the loaded font data using the specified @p name as a key. This means that loading the same fonts again will not result in duplicate operations. Instead, ThorVG will reuse the previously loaded font data.
+    /// Loads a scalable font data from a memory block of a given size. ThorVG efficiently caches the loaded font data using the specified @p name as a key. This means that loading the same fonts again will not result in duplicate operations. Instead, ThorVG will reuse the previously loaded font data.
     /// </summary>
     /// <param name="name">The name under which the font will be stored and accessible (e.x. in a @p tvg_text_set_font API).</param>
     /// <param name="data">A pointer to a memory location where the content of the font data is stored.</param>
@@ -1136,20 +1229,23 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_font_load_data([MarshalAs(UnmanagedType.LPUTF8Str)] string name, [In] byte[] data, uint size, [MarshalAs(UnmanagedType.LPUTF8Str)] string mimetype, [MarshalAs(UnmanagedType.I1)] bool copy);
 
     /// <summary>
-    /// This function is used to release resources associated with a font file that has been loaded into memory.
+    /// Unloads the specified scalable font data that was previously loaded. This function is used to release resources associated with a font file that has been loaded into memory.
     /// </summary>
     /// <param name="path">The path to the loaded font file.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_font_unload([MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
+    /// <summary>
+    /// Creates a new Tvg_Saver object.
+    /// </summary>
     /// <returns>A new Tvg_Saver object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial SaverHandle tvg_saver_new();
 
     /// <summary>
-    /// If the saver module supports any compression mechanism, it will optimize the data size. This might affect the encoding/decoding time in some cases. You can turn off the compression if you wish to optimize for speed.
+    /// Exports the given @p paint data to the given @p path If the saver module supports any compression mechanism, it will optimize the data size. This might affect the encoding/decoding time in some cases. You can turn off the compression if you wish to optimize for speed.
     /// </summary>
     /// <param name="saver">The Tvg_Saver object connected with the saving task.</param>
     /// <param name="paint">The paint to be saved with all its associated properties.</param>
@@ -1160,7 +1256,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_saver_save_paint(SaverHandle saver, PaintHandle paint, [MarshalAs(UnmanagedType.LPUTF8Str)] string path, uint quality);
 
     /// <summary>
-    /// If the saver module supports any compression mechanism, it will optimize the data size. This might affect the encoding/decoding time in some cases. You can turn off the compression if you wish to optimize for speed.
+    /// Exports the given @p animation data to the given @p path If the saver module supports any compression mechanism, it will optimize the data size. This might affect the encoding/decoding time in some cases. You can turn off the compression if you wish to optimize for speed.
     /// </summary>
     /// <param name="saver">The Tvg_Saver object connected with the saving task.</param>
     /// <param name="animation">The animation to be saved with all its associated properties.</param>
@@ -1172,25 +1268,31 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_saver_save_animation(SaverHandle saver, AnimationHandle animation, [MarshalAs(UnmanagedType.LPUTF8Str)] string path, uint quality, uint fps);
 
     /// <summary>
-    /// The behavior of the Saver module works on a sync/async basis, depending on the threading setting of the Initializer. Thus, if you wish to have a benefit of it, you must call tvg_saver_sync() after the tvg_saver_save_paint() in the proper delayed time. Otherwise, you can call tvg_saver_sync() immediately.
+    /// Guarantees that the saving task is finished. The behavior of the Saver module works on a sync/async basis, depending on the threading setting of the Initializer. Thus, if you wish to have a benefit of it, you must call tvg_saver_sync() after the tvg_saver_save_paint() in the proper delayed time. Otherwise, you can call tvg_saver_sync() immediately.
     /// </summary>
     /// <param name="saver">The Tvg_Saver object connected with the saving task.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_saver_sync(SaverHandle saver);
 
+    /// <summary>
+    /// Deletes the given Tvg_Saver object.
+    /// </summary>
     /// <param name="saver">The Tvg_Saver object to be deleted.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_saver_del(SaverHandle saver);
 
+    /// <summary>
+    /// Creates a new Animation object.
+    /// </summary>
     /// <returns>Tvg_Animation A new Tvg_Animation object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial AnimationHandle tvg_animation_new();
 
     /// <summary>
-    /// is less than 0.001. In such cases, it returns @c Result::InsufficientCondition. Values less than 0.001 may be disregarded and may not be accurately retained by the Animation.
+    /// Specifies the current frame in the animation. is less than 0.001. In such cases, it returns @c Result::InsufficientCondition. Values less than 0.001 may be disregarded and may not be accurately retained by the Animation.
     /// </summary>
     /// <param name="animation">A Tvg_Animation pointer to the animation object.</param>
     /// <param name="no">The index of the animation frame to be displayed. The index should be less than the tvg_animation_get_total_frame().</param>
@@ -1199,7 +1301,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_animation_set_frame(AnimationHandle animation, float no);
 
     /// <summary>
-    /// This function provides access to the picture instance that can be used to load animation formats, such as lot. After setting up the picture, it can be added to the designated canvas, enabling control over animation frames with this Animation instance.
+    /// Retrieves a picture instance associated with this animation instance. This function provides access to the picture instance that can be used to load animation formats, such as lot. After setting up the picture, it can be added to the designated canvas, enabling control over animation frames with this Animation instance.
     /// </summary>
     /// <param name="animation">A Tvg_Animation pointer to the animation object.</param>
     /// <returns>A picture instance that is tied to this animation.</returns>
@@ -1207,18 +1309,27 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial PaintHandle tvg_animation_get_picture(AnimationHandle animation);
 
+    /// <summary>
+    /// Retrieves the current frame number of the animation.
+    /// </summary>
     /// <param name="animation">A Tvg_Animation pointer to the animation object.</param>
     /// <param name="no">The current frame number of the animation, between 0 and totalFrame() - 1.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_animation_get_frame(AnimationHandle animation, nint no);
 
+    /// <summary>
+    /// Retrieves the total number of frames in the animation.
+    /// </summary>
     /// <param name="animation">A Tvg_Animation pointer to the animation object.</param>
     /// <param name="cnt">The total number of frames in the animation.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_animation_get_total_frame(AnimationHandle animation, nint cnt);
 
+    /// <summary>
+    /// Retrieves the duration of the animation in seconds.
+    /// </summary>
     /// <param name="animation">A Tvg_Animation pointer to the animation object.</param>
     /// <param name="duration">The duration of the animation in seconds.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -1226,7 +1337,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_animation_get_duration(AnimationHandle animation, nint duration);
 
     /// <summary>
-    /// The set segment is designated as the play area of the animation. This is useful for playing a specific segment within the entire animation. After setting, the number of animation frames and the playback time are calculated by mapping the playback segment as the entire range.
+    /// Specifies the playback segment of the animation. The set segment is designated as the play area of the animation. This is useful for playing a specific segment within the entire animation. After setting, the number of animation frames and the playback time are calculated by mapping the playback segment as the entire range.
     /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the animation object.</param>
     /// <param name="begin">segment begin frame.</param>
@@ -1235,6 +1346,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_animation_set_segment(AnimationHandle animation, float begin, float end);
 
+    /// <summary>
+    /// Gets the current segment range information.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the animation object.</param>
     /// <param name="begin">segment begin frame.</param>
     /// <param name="end">segment end frame.</param>
@@ -1242,23 +1356,32 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_animation_get_segment(AnimationHandle animation, out float begin, out float end);
 
+    /// <summary>
+    /// Deletes the given Tvg_Animation object.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation object to be deleted.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_animation_del(AnimationHandle animation);
 
+    /// <summary>
+    /// Creates a new accessor object.
+    /// </summary>
     /// <returns>A new accessor object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial AccessorHandle tvg_accessor_new();
 
+    /// <summary>
+    /// Deletes the given accessor object.
+    /// </summary>
     /// <param name="accessor">The accessor object to be deleted.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_accessor_del(AccessorHandle accessor);
 
     /// <summary>
-    /// Iterates through all descendents of the scene passed through the paint argument while calling func on each and passing the data pointer to this function. When func returns false iteration stops and the function returns.
+    /// Sets the paint of the accessor then iterates through its descendents. Iterates through all descendents of the scene passed through the paint argument while calling func on each and passing the data pointer to this function. When func returns false iteration stops and the function returns.
     /// </summary>
     /// <param name="accessor">A Tvg_Accessor pointer to the accessor object.</param>
     /// <param name="paint">A Tvg_Paint pointer to the scene object.</param>
@@ -1269,7 +1392,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_accessor_set(AccessorHandle accessor, PaintHandle paint, nint func, nint data);
 
     /// <summary>
-    /// This function computes a unique identifier value based on the provided string. You can use this to assign a unique ID to the Paint object.
+    /// Generate a unique ID (hash key) from a given name. This function computes a unique identifier value based on the provided string. You can use this to assign a unique ID to the Paint object.
     /// </summary>
     /// <param name="name">The input string to generate the unique identifier from.</param>
     /// <returns>The generated unique identifier value.</returns>
@@ -1277,11 +1400,17 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial uint tvg_accessor_generate_id([MarshalAs(UnmanagedType.LPUTF8Str)] string name);
 
+    /// <summary>
+    /// Creates a new LottieAnimation object.
+    /// </summary>
     /// <returns>Tvg_Animation A new Tvg_LottieAnimation object.</returns>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial AnimationHandle tvg_lottie_animation_new();
 
+    /// <summary>
+    /// Generates a new slot from the given slot data.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="slot">The Lottie slot data in JSON format.</param>
     /// <returns>The generated slot ID when successful, 0 otherwise.</returns>
@@ -1289,12 +1418,18 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial uint tvg_lottie_animation_gen_slot(AnimationHandle animation, [MarshalAs(UnmanagedType.LPUTF8Str)] string slot);
 
+    /// <summary>
+    /// Applies a previously generated slot to the animation.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="id">The ID of the slot to apply, or 0 to reset all slots.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_lottie_animation_apply_slot(AnimationHandle animation, uint id);
 
+    /// <summary>
+    /// Deletes a previously generated slot.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="id">The ID of the slot to delete.</param>
     /// <returns>Tvg_Result enumeration.</returns>
@@ -1302,18 +1437,27 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_lottie_animation_del_slot(AnimationHandle animation, uint id);
 
+    /// <summary>
+    /// Specifies a segment by marker.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="marker">The name of the segment marker.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_lottie_animation_set_marker(AnimationHandle animation, [MarshalAs(UnmanagedType.LPUTF8Str)] string marker);
 
+    /// <summary>
+    /// Gets the marker count of the animation.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="cnt">The count value of the markers.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_lottie_animation_get_markers_cnt(AnimationHandle animation, out uint cnt);
 
+    /// <summary>
+    /// Gets the marker name by a given index.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="idx">The index of the animation marker, starts from 0.</param>
     /// <param name="name">The name of marker when succeed.</param>
@@ -1322,7 +1466,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_lottie_animation_get_marker(AnimationHandle animation, uint idx, out nint name);
 
     /// <summary>
-    /// This method performs tweening, a process of generating intermediate frame between @p from and @p to based on the given @p progress.
+    /// Interpolates between two frames over a specified duration. This method performs tweening, a process of generating intermediate frame between @p from and @p to based on the given @p progress.
     /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="from">The start frame number of the interpolation.</param>
@@ -1332,6 +1476,9 @@ internal static partial class ThorVGNative
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
     internal static partial Result tvg_lottie_animation_tween(AnimationHandle animation, float from, float to, float progress);
 
+    /// <summary>
+    /// Updates the value of an expression variable for a specific layer.
+    /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="layer">The name of the layer containing the variable to be updated.</param>
     /// <param name="ix">The property index of the variable within the layer.</param>
@@ -1342,7 +1489,7 @@ internal static partial class ThorVGNative
     internal static partial Result tvg_lottie_animation_assign(AnimationHandle animation, [MarshalAs(UnmanagedType.LPUTF8Str)] string layer, uint ix, [MarshalAs(UnmanagedType.LPUTF8Str)] string var, float val);
 
     /// <summary>
-    /// This function controls the rendering quality of effects like blur, shadows, etc. Lower values prioritize performance while higher values prioritize quality. 100 represents highest quality/lowest performance, default is 50.
+    /// Sets the quality level for Lottie effects. This function controls the rendering quality of effects like blur, shadows, etc. Lower values prioritize performance while higher values prioritize quality. 100 represents highest quality/lowest performance, default is 50.
     /// </summary>
     /// <param name="animation">The Tvg_Animation pointer to the Lottie animation object.</param>
     /// <param name="value">The quality level (0-100). 0 represents lowest quality/best performance,</param>

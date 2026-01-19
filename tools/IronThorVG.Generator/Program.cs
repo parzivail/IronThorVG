@@ -659,9 +659,9 @@ internal static class DocParser
             {
                 continue;
             }
-            else if (!line.StartsWith("@", StringComparison.Ordinal))
+            else if (line.StartsWith("@brief ") || !line.StartsWith("@", StringComparison.Ordinal))
             {
-                summaryLines.Add(line);
+                summaryLines.Add(line.Replace("@brief ", string.Empty, StringComparison.Ordinal));
             }
         }
 

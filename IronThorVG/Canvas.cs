@@ -94,7 +94,7 @@ public abstract class Canvas : IDisposable
             throw new ArgumentNullException(nameof(paint));
         }
 
-        ResultGuard.EnsureSuccess(ThorVGNative.tvg_canvas_insert(Handle, paint.Handle, before?.Handle));
+        ResultGuard.EnsureSuccess(ThorVGNative.tvg_canvas_insert(Handle, paint.Handle, before?.Handle ?? PaintHandle.Null));
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_canvas_remove(CanvasHandle, PaintHandle)" />

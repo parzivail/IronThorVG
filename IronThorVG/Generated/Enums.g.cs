@@ -2,7 +2,7 @@
 namespace IronThorVG;
 
 /// <summary>
-/// All ThorVG APIs could potentially return one of the values in the list. Please note that some APIs may additionally specify the reasons that trigger their return values.
+/// Enumeration specifying the result from the APIs. All ThorVG APIs could potentially return one of the values in the list. Please note that some APIs may additionally specify the reasons that trigger their return values.
 /// Native: Tvg_Result
 /// </summary>
 public enum Result : uint
@@ -30,6 +30,10 @@ public enum Result : uint
     Unknown = 255,
 }
 
+/// <summary>
+/// Enumeration specifying the methods of combining the 8-bit color channels into 32-bit color.
+/// Native: Tvg_Colorspace
+/// </summary>
 public enum Colorspace : uint
 {
     /// <summary>The channels are joined in the order: alpha, blue, green, red. Colors are alpha-premultiplied.</summary>
@@ -50,7 +54,7 @@ public enum Colorspace : uint
 }
 
 /// <summary>
-/// It attempts to optimize rendering performance by updating only the regions  of the canvas that have changed between frames (partial redraw). This can be highly effective in scenarios  where most of the canvas remains static and only small portions are updated—such as simple animations or GUI interactions. However, in complex scenes where a large portion of the canvas changes frequently (e.g., full-screen animations or heavy object movements), the overhead of tracking changes and managing update regions may outweigh the benefits, resulting in decreased performance compared to the default rendering mode. Thus, it is recommended to benchmark both modes in your specific use case to determine the optimal setting.
+/// Enumeration to specify rendering engine behavior. It attempts to optimize rendering performance by updating only the regions  of the canvas that have changed between frames (partial redraw). This can be highly effective in scenarios  where most of the canvas remains static and only small portions are updated—such as simple animations or GUI interactions. However, in complex scenes where a large portion of the canvas changes frequently (e.g., full-screen animations or heavy object movements), the overhead of tracking changes and managing update regions may outweigh the benefits, resulting in decreased performance compared to the default rendering mode. Thus, it is recommended to benchmark both modes in your specific use case to determine the optimal setting.
 /// Native: Tvg_Engine_Option
 /// </summary>
 [System.Flags]
@@ -67,6 +71,10 @@ public enum EngineOptions : uint
     SmartRender = 1 << 1,
 }
 
+/// <summary>
+/// Enumeration indicating the method used in the masking of two objects - the target and the source.
+/// Native: Tvg_Mask_Method
+/// </summary>
 public enum MaskMethod : uint
 {
     /// <summary>No Masking is applied.</summary>
@@ -104,6 +112,10 @@ public enum MaskMethod : uint
     Darken,
 }
 
+/// <summary>
+/// Enumeration indicates the method used for blending paint. Please refer to the respective formulas for each method.
+/// Native: Tvg_Blend_Method
+/// </summary>
 public enum BlendMethod : uint
 {
     /// <summary>Perform the alpha blending(default). S if (Sa == 255), otherwise (Sa * S) + (255 - Sa) * D</summary>
@@ -163,7 +175,7 @@ public enum BlendMethod : uint
 }
 
 /// <summary>
-/// ThorVG's drawing objects can return object type values, allowing you to identify the specific type of each object.
+/// Enumeration indicating the ThorVG object type value. ThorVG's drawing objects can return object type values, allowing you to identify the specific type of each object.
 /// Native: Tvg_Type
 /// </summary>
 public enum Type : uint
@@ -191,6 +203,10 @@ public enum Type : uint
     RadialGrad,
 }
 
+/// <summary>
+/// Enumeration determining the ending type of a stroke in the open sub-paths.
+/// Native: Tvg_Stroke_Cap
+/// </summary>
 public enum StrokeCap : uint
 {
     /// <summary>The stroke ends exactly at each of the two endpoints of a sub-path. For zero length sub-paths no stroke is rendered.</summary>
@@ -204,6 +220,10 @@ public enum StrokeCap : uint
     Square,
 }
 
+/// <summary>
+/// Enumeration specifying how to fill the area outside the gradient bounds.
+/// Native: Tvg_Stroke_Join
+/// </summary>
 public enum StrokeJoin : uint
 {
     /// <summary>The outer corner of the joined path segments is spiked. The spike is created by extension beyond the join point of the outer edges of the stroke until they intersect. In case the extension goes beyond the limit, the join style is converted to the Bevel style.</summary>
@@ -217,6 +237,10 @@ public enum StrokeJoin : uint
     Bevel,
 }
 
+/// <summary>
+/// Enumeration specifying how to fill the area outside the gradient bounds.
+/// Native: Tvg_Stroke_Fill
+/// </summary>
 public enum StrokeFill : uint
 {
     /// <summary>The remaining area is filled with the closest stop color.</summary>
@@ -230,6 +254,10 @@ public enum StrokeFill : uint
     Repeat,
 }
 
+/// <summary>
+/// Enumeration specifying the algorithm used to establish which parts of the shape are treated as the inside of the shape.
+/// Native: Tvg_Fill_Rule
+/// </summary>
 public enum FillRule : uint
 {
     /// <summary>A line from the point to a location outside the shape is drawn. The intersections of the line with the path segment of the shape are counted. Starting from zero, if the path segment of the shape crosses the line clockwise, one is added, otherwise one is subtracted. If the resulting sum is non zero, the point is inside the shape.</summary>
@@ -240,6 +268,10 @@ public enum FillRule : uint
     EvenOdd,
 }
 
+/// <summary>
+/// A data structure storing the information about the color and its relative position inside the gradient bounds.
+/// Native: Tvg_Text_Wrap
+/// </summary>
 public enum TextWrap : uint
 {
     /// <summary>Do not wrap text. Text is rendered on a single line and may overflow the bounding area.</summary>

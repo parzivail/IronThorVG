@@ -3,12 +3,20 @@ using System.Runtime.InteropServices;
 
 namespace IronThorVG;
 
+/// <summary>
+/// A data structure storing the information about the color and its relative position inside the gradient bounds.
+/// Native: Tvg_Color_Stop
+/// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct ColorStop
 {
     public float Offset;
 }
 
+/// <summary>
+/// A data structure representing a point in two-dimensional space.
+/// Native: Tvg_Point
+/// </summary>
 [StructLayout(LayoutKind.Sequential)]
 public struct Point
 {
@@ -17,7 +25,7 @@ public struct Point
 }
 
 /// <summary>
-/// The elements e11, e12, e21 and e22 represent the rotation matrix, including the scaling factor. The elements e13 and e23 determine the translation of the object along the x and y-axis, respectively. The elements e31 and e32 are set to 0, e33 is set to 1.
+/// A data structure representing a three-dimensional matrix. The elements e11, e12, e21 and e22 represent the rotation matrix, including the scaling factor. The elements e13 and e23 determine the translation of the object along the x and y-axis, respectively. The elements e31 and e32 are set to 0, e33 is set to 1.
 /// Native: Tvg_Matrix
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
