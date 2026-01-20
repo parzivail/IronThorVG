@@ -55,11 +55,7 @@ public sealed class Shape : Paint
     /// <inheritdoc cref="ThorVGNative.tvg_shape_get_path(PaintHandle, out nint, out uint, out nint, out uint)" />
     public (byte[] Commands, Point[] Points) GetPath()
     {
-        nint cmdsPtr;
-        uint cmdsCnt;
-        nint ptsPtr;
-        uint ptsCnt;
-        var result = ThorVGNative.tvg_shape_get_path(Handle, out cmdsPtr, out cmdsCnt, out ptsPtr, out ptsCnt);
+        var result = ThorVGNative.tvg_shape_get_path(Handle, out var cmdsPtr, out var cmdsCnt, out var ptsPtr, out var ptsCnt);
         ResultGuard.EnsureSuccess(result);
         var commands = new byte[cmdsCnt];
         var points = new Point[ptsCnt];
@@ -88,8 +84,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            float width;
-            var result = ThorVGNative.tvg_shape_get_stroke_width(Handle, out width);
+            var result = ThorVGNative.tvg_shape_get_stroke_width(Handle, out var width);
             ResultGuard.EnsureSuccess(result);
             return width;
         }
@@ -102,11 +97,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            byte r;
-            byte g;
-            byte b;
-            byte a;
-            var result = ThorVGNative.tvg_shape_get_stroke_color(Handle, out r, out g, out b, out a);
+            var result = ThorVGNative.tvg_shape_get_stroke_color(Handle, out var r, out var g, out var b, out var a);
             ResultGuard.EnsureSuccess(result);
             return new Color(r, g, b, a);
         }
@@ -119,8 +110,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            GradientHandle handle;
-            var result = ThorVGNative.tvg_shape_get_stroke_gradient(Handle, out handle);
+            var result = ThorVGNative.tvg_shape_get_stroke_gradient(Handle, out var handle);
             ResultGuard.EnsureSuccess(result);
             return Gradient.FromHandle(handle);
         }
@@ -133,10 +123,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            nint patternPtr;
-            uint cnt;
-            float offset;
-            var result = ThorVGNative.tvg_shape_get_stroke_dash(Handle, out patternPtr, out cnt, out offset);
+            var result = ThorVGNative.tvg_shape_get_stroke_dash(Handle, out var patternPtr, out var cnt, out var offset);
             ResultGuard.EnsureSuccess(result);
             if (cnt == 0 || patternPtr == nint.Zero)
             {
@@ -173,8 +160,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            StrokeCap cap;
-            var result = ThorVGNative.tvg_shape_get_stroke_cap(Handle, out cap);
+            var result = ThorVGNative.tvg_shape_get_stroke_cap(Handle, out var cap);
             ResultGuard.EnsureSuccess(result);
             return cap;
         }
@@ -187,8 +173,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            StrokeJoin join;
-            var result = ThorVGNative.tvg_shape_get_stroke_join(Handle, out join);
+            var result = ThorVGNative.tvg_shape_get_stroke_join(Handle, out var join);
             ResultGuard.EnsureSuccess(result);
             return join;
         }
@@ -201,8 +186,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            float miterLimit;
-            var result = ThorVGNative.tvg_shape_get_stroke_miterlimit(Handle, out miterLimit);
+            var result = ThorVGNative.tvg_shape_get_stroke_miterlimit(Handle, out var miterLimit);
             ResultGuard.EnsureSuccess(result);
             return miterLimit;
         }
@@ -219,11 +203,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            byte r;
-            byte g;
-            byte b;
-            byte a;
-            var result = ThorVGNative.tvg_shape_get_fill_color(Handle, out r, out g, out b, out a);
+            var result = ThorVGNative.tvg_shape_get_fill_color(Handle, out var r, out var g, out var b, out var a);
             ResultGuard.EnsureSuccess(result);
             return new Color(r, g, b, a);
         }
@@ -236,8 +216,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            FillRule rule;
-            var result = ThorVGNative.tvg_shape_get_fill_rule(Handle, out rule);
+            var result = ThorVGNative.tvg_shape_get_fill_rule(Handle, out var rule);
             ResultGuard.EnsureSuccess(result);
             return rule;
         }
@@ -254,8 +233,7 @@ public sealed class Shape : Paint
     {
         get
         {
-            GradientHandle handle;
-            var result = ThorVGNative.tvg_shape_get_gradient(Handle, out handle);
+            var result = ThorVGNative.tvg_shape_get_gradient(Handle, out var handle);
             ResultGuard.EnsureSuccess(result);
             return Gradient.FromHandle(handle);
         }

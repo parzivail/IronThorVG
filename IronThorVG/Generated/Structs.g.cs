@@ -8,9 +8,18 @@ namespace IronThorVG;
 /// Native: Tvg_Color_Stop
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public struct ColorStop
+public partial struct ColorStop
 {
+    /// <summary>The relative position of the color.</summary>
     public float Offset;
+    /// <summary>The red color channel value in the range [0 ~ 255].</summary>
+    public byte R;
+    /// <summary>The green color channel value in the range [0 ~ 255].</summary>
+    public byte G;
+    /// <summary>The blue color channel value in the range [0 ~ 255].</summary>
+    public byte B;
+    /// <summary>The alpha channel value in the range [0 ~ 255], where 0 is completely transparent and 255 is opaque.</summary>
+    public byte A;
 }
 
 /// <summary>
@@ -18,7 +27,7 @@ public struct ColorStop
 /// Native: Tvg_Point
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public struct Point
+public partial struct Point
 {
     public float X;
     public float Y;
@@ -29,7 +38,7 @@ public struct Point
 /// Native: Tvg_Matrix
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public struct Matrix
+public partial struct Matrix
 {
     public float E11;
     public float E12;

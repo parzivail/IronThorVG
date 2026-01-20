@@ -23,13 +23,7 @@ public sealed class RadialGradient : Gradient
     {
         get
         {
-            float cx;
-            float cy;
-            float r;
-            float fx;
-            float fy;
-            float fr;
-            var result = ThorVGNative.tvg_radial_gradient_get(Handle, out cx, out cy, out r, out fx, out fy, out fr);
+            var result = ThorVGNative.tvg_radial_gradient_get(Handle, out var cx, out var cy, out var r, out var fx, out var fy, out var fr);
             ResultGuard.EnsureSuccess(result);
             return new RadialGradientParameters(cx, cy, r, fx, fy, fr);
         }

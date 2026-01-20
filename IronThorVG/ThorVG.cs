@@ -28,11 +28,7 @@ public static class ThorVG
     /// <inheritdoc cref="ThorVGNative.tvg_engine_version()" />
     public static EngineVersion GetVersion()
     {
-        uint major;
-        uint minor;
-        uint micro;
-        nint versionPtr;
-        var result = ThorVGNative.tvg_engine_version(out major, out minor, out micro, out versionPtr);
+        var result = ThorVGNative.tvg_engine_version(out var major, out var minor, out var micro, out var versionPtr);
         ResultGuard.EnsureSuccess(result);
         var versionString = versionPtr == nint.Zero ? null : Marshal.PtrToStringUTF8(versionPtr);
         return new EngineVersion(major, minor, micro, versionString);

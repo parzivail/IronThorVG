@@ -43,30 +43,26 @@ public sealed class Picture : Paint
 
     /// <inheritdoc cref="ThorVGNative.tvg_picture_set_size(PaintHandle, float, float)" />
     /// <inheritdoc cref="ThorVGNative.tvg_picture_get_size(PaintHandle, out float, out float)" />
-    public SizeF Size
+    public Point Size
     {
         get
         {
-            float width;
-            float height;
-            var result = ThorVGNative.tvg_picture_get_size(Handle, out width, out height);
+            var result = ThorVGNative.tvg_picture_get_size(Handle, out var width, out var height);
             ResultGuard.EnsureSuccess(result);
-            return new SizeF(width, height);
+            return new Point(width, height);
         }
-        set => _ = ThorVGNative.tvg_picture_set_size(Handle, value.Width, value.Height);
+        set => _ = ThorVGNative.tvg_picture_set_size(Handle, value.X, value.Y);
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_picture_set_origin(PaintHandle, float, float)" />
     /// <inheritdoc cref="ThorVGNative.tvg_picture_get_origin(PaintHandle, out float, out float)" />
-    public PointF Origin
+    public Point Origin
     {
         get
         {
-            float x;
-            float y;
-            var result = ThorVGNative.tvg_picture_get_origin(Handle, out x, out y);
+            var result = ThorVGNative.tvg_picture_get_origin(Handle, out var x, out var y);
             ResultGuard.EnsureSuccess(result);
-            return new PointF(x, y);
+            return new Point(x, y);
         }
         set => _ = ThorVGNative.tvg_picture_set_origin(Handle, value.X, value.Y);
     }

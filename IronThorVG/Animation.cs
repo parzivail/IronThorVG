@@ -76,9 +76,7 @@ public sealed class Animation : IDisposable
     {
         get
         {
-            float begin;
-            float end;
-            var result = ThorVGNative.tvg_animation_get_segment(Handle, out begin, out end);
+            var result = ThorVGNative.tvg_animation_get_segment(Handle, out var begin, out var end);
             ResultGuard.EnsureSuccess(result);
             return new SegmentRange(begin, end);
         }
@@ -110,8 +108,7 @@ public sealed class Animation : IDisposable
     /// <inheritdoc cref="ThorVGNative.tvg_lottie_animation_get_markers_cnt(AnimationHandle, out uint)" />
     public uint GetMarkerCount()
     {
-        uint count;
-        var result = ThorVGNative.tvg_lottie_animation_get_markers_cnt(Handle, out count);
+        var result = ThorVGNative.tvg_lottie_animation_get_markers_cnt(Handle, out var count);
         ResultGuard.EnsureSuccess(result);
         return count;
     }
@@ -119,8 +116,7 @@ public sealed class Animation : IDisposable
     /// <inheritdoc cref="ThorVGNative.tvg_lottie_animation_get_marker(AnimationHandle, uint, out nint)" />
     public string? GetMarker(uint index)
     {
-        nint namePtr;
-        var result = ThorVGNative.tvg_lottie_animation_get_marker(Handle, index, out namePtr);
+        var result = ThorVGNative.tvg_lottie_animation_get_marker(Handle, index, out var namePtr);
         ResultGuard.EnsureSuccess(result);
         return namePtr == nint.Zero ? null : Marshal.PtrToStringUTF8(namePtr);
     }

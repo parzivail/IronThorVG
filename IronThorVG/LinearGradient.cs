@@ -23,11 +23,7 @@ public sealed class LinearGradient : Gradient
     {
         get
         {
-            float x1;
-            float y1;
-            float x2;
-            float y2;
-            var result = ThorVGNative.tvg_linear_gradient_get(Handle, out x1, out y1, out x2, out y2);
+            var result = ThorVGNative.tvg_linear_gradient_get(Handle, out var x1, out var y1, out var x2, out var y2);
             ResultGuard.EnsureSuccess(result);
             return (x1, y1, x2, y2);
         }

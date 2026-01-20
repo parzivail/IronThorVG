@@ -42,9 +42,7 @@ public abstract class Gradient : IDisposable
     {
         get
         {
-            nint ptr;
-            uint cnt;
-            var result = ThorVGNative.tvg_gradient_get_color_stops(Handle, out ptr, out cnt);
+            var result = ThorVGNative.tvg_gradient_get_color_stops(Handle, out var ptr, out var cnt);
             ResultGuard.EnsureSuccess(result);
             if (cnt == 0 || ptr == nint.Zero)
             {
@@ -70,8 +68,7 @@ public abstract class Gradient : IDisposable
     {
         get
         {
-            StrokeFill spread;
-            var result = ThorVGNative.tvg_gradient_get_spread(Handle, out spread);
+            var result = ThorVGNative.tvg_gradient_get_spread(Handle, out var spread);
             ResultGuard.EnsureSuccess(result);
             return spread;
         }
@@ -84,8 +81,7 @@ public abstract class Gradient : IDisposable
     {
         get
         {
-            Matrix matrix;
-            var result = ThorVGNative.tvg_gradient_get_transform(Handle, out matrix);
+            var result = ThorVGNative.tvg_gradient_get_transform(Handle, out var matrix);
             ResultGuard.EnsureSuccess(result);
             return matrix;
         }
@@ -97,8 +93,7 @@ public abstract class Gradient : IDisposable
     {
         get
         {
-            Type type;
-            var result = ThorVGNative.tvg_gradient_get_type(Handle, out type);
+            var result = ThorVGNative.tvg_gradient_get_type(Handle, out var type);
             ResultGuard.EnsureSuccess(result);
             return type;
         }
@@ -136,8 +131,7 @@ public abstract class Gradient : IDisposable
             return null;
         }
 
-        Type type;
-        var result = ThorVGNative.tvg_gradient_get_type(handle, out type);
+        var result = ThorVGNative.tvg_gradient_get_type(handle, out var type);
         if (result != Result.Success)
         {
             return new RawGradient(handle);

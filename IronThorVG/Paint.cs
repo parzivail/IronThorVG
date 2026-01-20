@@ -62,8 +62,7 @@ public abstract class Paint : IDisposable
     {
         get
         {
-            Matrix matrix;
-            var result = ThorVGNative.tvg_paint_get_transform(Handle, out matrix);
+            var result = ThorVGNative.tvg_paint_get_transform(Handle, out var matrix);
             ResultGuard.EnsureSuccess(result);
             return matrix;
         }
@@ -76,8 +75,7 @@ public abstract class Paint : IDisposable
     {
         get
         {
-            byte opacity;
-            var result = ThorVGNative.tvg_paint_get_opacity(Handle, out opacity);
+            var result = ThorVGNative.tvg_paint_get_opacity(Handle, out var opacity);
             ResultGuard.EnsureSuccess(result);
             return opacity;
         }
@@ -95,25 +93,20 @@ public abstract class Paint : IDisposable
     public bool Intersects(int x, int y, int width, int height) => ThorVGNative.tvg_paint_intersects(Handle, x, y, width, height);
 
     /// <inheritdoc cref="ThorVGNative.tvg_paint_get_aabb(PaintHandle, out float, out float, out float, out float)" />
-    public RectF AxisAlignedBoundingBox
+    public (Point Origin, Point Size) AxisAlignedBoundingBox
     {
         get
         {
-            float x;
-            float y;
-            float width;
-            float height;
-            var result = ThorVGNative.tvg_paint_get_aabb(Handle, out x, out y, out width, out height);
+            var result = ThorVGNative.tvg_paint_get_aabb(Handle, out var x, out var y, out var width, out var height);
             ResultGuard.EnsureSuccess(result);
-            return new RectF(x, y, width, height);
+            return (new Point(x, y), new Point(width, height));
         }
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_paint_get_obb(PaintHandle, out Point)" />
     public Point GetOrientedBoundingBox()
     {
-        Point point;
-        var result = ThorVGNative.tvg_paint_get_obb(Handle, out point);
+        var result = ThorVGNative.tvg_paint_get_obb(Handle, out var point);
         ResultGuard.EnsureSuccess(result);
         return point;
     }
@@ -124,9 +117,7 @@ public abstract class Paint : IDisposable
     {
         get
         {
-            PaintHandle targetHandle;
-            MaskMethod method;
-            var result = ThorVGNative.tvg_paint_get_mask_method(Handle, out targetHandle, out method);
+            var result = ThorVGNative.tvg_paint_get_mask_method(Handle, out var targetHandle, out var method);
             ResultGuard.EnsureSuccess(result);
             var target = FromHandle(targetHandle);
             return new MaskMethodState(target, method);
@@ -163,8 +154,7 @@ public abstract class Paint : IDisposable
     {
         get
         {
-            Type type;
-            var result = ThorVGNative.tvg_paint_get_type(Handle, out type);
+            var result = ThorVGNative.tvg_paint_get_type(Handle, out var type);
             ResultGuard.EnsureSuccess(result);
             return type;
         }
@@ -199,8 +189,7 @@ public abstract class Paint : IDisposable
             return null;
         }
 
-        Type type;
-        var result = ThorVGNative.tvg_paint_get_type(handle, out type);
+        var result = ThorVGNative.tvg_paint_get_type(handle, out var type);
         if (result != Result.Success)
         {
             return new RawPaint(handle);
