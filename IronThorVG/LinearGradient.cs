@@ -19,14 +19,14 @@ public sealed class LinearGradient : Gradient
 
     /// <inheritdoc cref="ThorVGNative.tvg_linear_gradient_set(GradientHandle, float, float, float, float)" />
     /// <inheritdoc cref="ThorVGNative.tvg_linear_gradient_get(GradientHandle, out float, out float, out float, out float)" />
-    public (float X1, float Y1, float X2, float Y2) Bounds
+    public LinearGradientBounds Bounds
     {
         get
         {
             var result = ThorVGNative.tvg_linear_gradient_get(Handle, out var x1, out var y1, out var x2, out var y2);
             ResultGuard.EnsureSuccess(result);
-            return (x1, y1, x2, y2);
+            return new LinearGradientBounds(new Point(x1, y1), new Point(x2, y2));
         }
-        set => _ = ThorVGNative.tvg_linear_gradient_set(Handle, value.X1, value.Y1, value.X2, value.Y2);
+        set => _ = ThorVGNative.tvg_linear_gradient_set(Handle, value.Start.X, value.Start.Y, value.End.X, value.End.Y);
     }
 }

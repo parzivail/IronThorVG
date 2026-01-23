@@ -168,6 +168,21 @@ public readonly record struct Color(byte R, byte G, byte B, byte A)
 public readonly record struct StrokeDashPattern(float[] DashPattern, float Offset);
 
 /// <summary>
+/// Represents gradient bounds.
+/// </summary>
+public readonly record struct LinearGradientBounds(Point Start, Point End);
+
+/// <summary>
+/// Represents text spacing.
+/// </summary>
+public readonly record struct TextSpacing(float Letter, float Line);
+
+/// <summary>
+/// Represents a solid stroke.
+/// </summary>
+public readonly record struct SolidStroke(float Width, Color Color);
+
+/// <summary>
 /// Represents a segment range with a beginning and end value.
 /// </summary>
 public readonly record struct SegmentRange(float Begin, float End);
@@ -181,3 +196,30 @@ public readonly record struct RadialGradientParameters(float Cx, float Cy, float
 /// Mask method metadata returned by native API.
 /// </summary>
 public readonly record struct MaskMethodState(Paint? Target, MaskMethod Method);
+
+/// <summary>
+/// Represents a rectangle.
+/// </summary>
+public record struct Rect(float X, float Y, float Width, float Height)
+{
+	public Point Position => new(X, Y);
+	public Point Size => new(Width, Height);
+	
+	public Point Extent => Position + Size;
+	public Point Center => Position + Size / 2;
+	
+	public Rect CenterOn(Point point)
+	{
+		return new Rect(point.X - Width / 2, point.Y - Height / 2, Width, Height);
+	}
+
+	public Rect Translate(Point offset)
+	{
+		return new Rect(X + offset.X, Y + offset.Y, Width, Height);
+	}
+
+	public Rect Inflate(Point offset)
+	{
+		return new Rect(X - offset.X, Y - offset.Y, Width + offset.X, Height + offset.Y);
+	}
+}

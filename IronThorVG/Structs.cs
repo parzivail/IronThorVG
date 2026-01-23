@@ -2,7 +2,7 @@
 
 namespace IronThorVG;
 
-public partial struct Point
+public partial struct Point : IEquatable<Point>
 {
 	public Point()
 	{
@@ -12,6 +12,56 @@ public partial struct Point
 	{
 		X = x;
 		Y = y;
+	}
+
+	public bool Equals(Point other)
+	{
+		return X.Equals(other.X) && Y.Equals(other.Y);
+	}
+
+	public override bool Equals(object? obj)
+	{
+		return obj is Point other && Equals(other);
+	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(X, Y);
+	}
+	
+	public static Point operator +(Point left, Point right)
+	{
+		return new Point(left.X + right.X, left.Y + right.Y);
+	}
+
+	public static Point operator -(Point left, Point right)
+	{
+		return new Point(left.X - right.X, left.Y - right.Y);
+	}
+
+	public static Point operator *(Point point, float scalar)
+	{
+		return new Point(point.X * scalar, point.Y * scalar);
+	}
+
+	public static Point operator *(float scalar, Point point)
+	{
+		return new Point(point.X * scalar, point.Y * scalar);
+	}
+
+	public static Point operator /(Point point, float scalar)
+	{
+		return new Point(point.X / scalar, point.Y / scalar);
+	}
+
+	public static bool operator ==(Point left, Point right)
+	{
+		return left.Equals(right);
+	}
+
+	public static bool operator !=(Point left, Point right)
+	{
+		return !left.Equals(right);
 	}
 }
 
@@ -45,7 +95,7 @@ public partial struct ColorStop
 /// The elements e13 and e23 determine the translation of the object along the x and y-axis, respectively.
 /// The elements e31 and e32 are set to 0, e33 is set to 1.
 /// </summary>
-public partial struct Matrix
+public partial struct Matrix : IEquatable<Matrix>
 {
 	public static readonly Matrix Identity = new()
 	{
@@ -148,5 +198,40 @@ public partial struct Matrix
 			X = matrix.E11 * point.X + matrix.E12 * point.Y + matrix.E13,
 			Y = matrix.E21 * point.X + matrix.E22 * point.Y + matrix.E23
 		};
+	}
+
+	public bool Equals(Matrix other)
+	{
+		return E11.Equals(other.E11) && E12.Equals(other.E12) && E13.Equals(other.E13) && E21.Equals(other.E21) && E22.Equals(other.E22) && E23.Equals(other.E23) && E31.Equals(other.E31) && E32.Equals(other.E32) && E33.Equals(other.E33);
+	}
+
+	public override bool Equals(object? obj)
+	{
+		return obj is Matrix other && Equals(other);
+	}
+
+	public override int GetHashCode()
+	{
+		var hashCode = new HashCode();
+		hashCode.Add(E11);
+		hashCode.Add(E12);
+		hashCode.Add(E13);
+		hashCode.Add(E21);
+		hashCode.Add(E22);
+		hashCode.Add(E23);
+		hashCode.Add(E31);
+		hashCode.Add(E32);
+		hashCode.Add(E33);
+		return hashCode.ToHashCode();
+	}
+
+	public static bool operator ==(Matrix left, Matrix right)
+	{
+		return left.Equals(right);
+	}
+
+	public static bool operator !=(Matrix left, Matrix right)
+	{
+		return !left.Equals(right);
 	}
 }
