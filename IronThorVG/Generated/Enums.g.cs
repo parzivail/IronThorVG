@@ -178,7 +178,7 @@ public enum BlendMethod : uint
 /// Enumeration indicating the ThorVG object type value. ThorVG's drawing objects can return object type values, allowing you to identify the specific type of each object.
 /// Native: Tvg_Type
 /// </summary>
-public enum Type : uint
+public enum PaintType : uint
 {
     /// <summary>Undefined type.</summary>
     /// <remarks>Native: TVG_TYPE_UNDEF</remarks>

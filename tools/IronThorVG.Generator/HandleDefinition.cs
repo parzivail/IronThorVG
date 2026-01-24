@@ -1,0 +1,1 @@
+﻿internal sealed record HandleDefinition(string Name, string NativeName);

@@ -1,0 +1,1 @@
+﻿internal sealed record StructFieldDefinition(string Name, string TypeName, string? Summary);

@@ -1,0 +1,1 @@
+﻿internal sealed record EnumValueDefinition(string Name, string NativeName, string? Value, string? Summary);

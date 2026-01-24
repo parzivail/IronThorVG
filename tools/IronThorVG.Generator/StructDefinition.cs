@@ -1,0 +1,1 @@
+﻿internal sealed record StructDefinition(string Name, string NativeName, string? Summary, IReadOnlyList<StructFieldDefinition> Fields);

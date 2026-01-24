@@ -88,8 +88,8 @@ public abstract class Gradient : IDisposable
         set => _ = ThorVGNative.tvg_gradient_set_transform(Handle, in value);
     }
 
-    /// <inheritdoc cref="ThorVGNative.tvg_gradient_get_type(GradientHandle, out Type)" />
-    public Type GradientType
+    /// <inheritdoc cref="ThorVGNative.tvg_gradient_get_type(GradientHandle, out PaintType)" />
+    public PaintType GradientType
     {
         get
         {
@@ -139,8 +139,8 @@ public abstract class Gradient : IDisposable
 
         return type switch
         {
-            Type.LinearGrad => new LinearGradient(handle),
-            Type.RadialGrad => new RadialGradient(handle),
+            PaintType.LinearGrad => new LinearGradient(handle),
+            PaintType.RadialGrad => new RadialGradient(handle),
             _ => new RawGradient(handle),
         };
     }

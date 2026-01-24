@@ -9,6 +9,12 @@ namespace IronThorVG.Native;
 /// </summary>
 internal sealed class CanvasHandle : SafeHandle
 {
+    public static readonly CanvasHandle Null = new(false);
+    
+    private CanvasHandle(bool ownsHandle) : base(IntPtr.Zero, ownsHandle)
+    {
+    }
+    
     public CanvasHandle() : base(IntPtr.Zero, ownsHandle: true)
     {
     }
@@ -65,6 +71,12 @@ internal sealed class PaintHandle : SafeHandle
 /// </summary>
 internal sealed class GradientHandle : SafeHandle
 {
+    public static readonly GradientHandle Null = new(false);
+    
+    private GradientHandle(bool ownsHandle) : base(IntPtr.Zero, ownsHandle)
+    {
+    }
+    
     public GradientHandle() : base(IntPtr.Zero, ownsHandle: true)
     {
     }
@@ -90,6 +102,12 @@ internal sealed class GradientHandle : SafeHandle
 /// </summary>
 internal sealed class SaverHandle : SafeHandle
 {
+    public static readonly SaverHandle Null = new(false);
+    
+    private SaverHandle(bool ownsHandle) : base(IntPtr.Zero, ownsHandle)
+    {
+    }
+    
     public SaverHandle() : base(IntPtr.Zero, ownsHandle: true)
     {
     }
@@ -115,6 +133,12 @@ internal sealed class SaverHandle : SafeHandle
 /// </summary>
 internal sealed class AnimationHandle : SafeHandle
 {
+    public static readonly AnimationHandle Null = new(false);
+    
+    private AnimationHandle(bool ownsHandle) : base(IntPtr.Zero, ownsHandle)
+    {
+    }
+    
     public AnimationHandle() : base(IntPtr.Zero, ownsHandle: true)
     {
     }
@@ -140,6 +164,12 @@ internal sealed class AnimationHandle : SafeHandle
 /// </summary>
 internal sealed class AccessorHandle : SafeHandle
 {
+    public static readonly AccessorHandle Null = new(false);
+    
+    private AccessorHandle(bool ownsHandle) : base(IntPtr.Zero, ownsHandle)
+    {
+    }
+    
     public AccessorHandle() : base(IntPtr.Zero, ownsHandle: true)
     {
     }

@@ -390,7 +390,7 @@ internal static partial class ThorVGNative
     /// <param name="type">The unique type of the paint instance type.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_paint_get_type(PaintHandle paint, out Type type);
+    internal static partial Result tvg_paint_get_type(PaintHandle paint, out PaintType type);
 
     /// <summary>
     /// Sets the blending method for the paint object. The blending feature allows you to combine colors to create visually appealing effects, including transparency, lighting, shading, and color mixing, among others. its process involves the combination of colors or images from the source paint object with the destination (the lower layer image) using blending operations. The blending operation is determined by the chosen @p BlendMethod, which specifies how the colors or images are combined.
@@ -857,7 +857,7 @@ internal static partial class ThorVGNative
     /// <param name="type">The unique type of the gradient instance type.</param>
     [LibraryImport(ThorVGNative.LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = new[] { typeof(CallConvCdecl) })]
-    internal static partial Result tvg_gradient_get_type(GradientHandle grad, out Type type);
+    internal static partial Result tvg_gradient_get_type(GradientHandle grad, out PaintType type);
 
     /// <summary>
     /// Duplicates the given Tvg_Gradient object. Creates a new object and sets its all properties as in the original object.

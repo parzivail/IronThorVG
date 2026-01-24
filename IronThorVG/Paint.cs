@@ -150,7 +150,7 @@ public abstract class Paint : IDisposable
     /// <summary>
     /// Gets the paint type reported by the native API.
     /// </summary>
-    public Type PaintType
+    public PaintType PaintType
     {
         get
         {
@@ -197,10 +197,10 @@ public abstract class Paint : IDisposable
 
         return type switch
         {
-            Type.Shape => new Shape(handle),
-            Type.Picture => new Picture(handle),
-            Type.Scene => new Scene(handle),
-            Type.Text => new Text(handle),
+            PaintType.Shape => new Shape(handle),
+            PaintType.Picture => new Picture(handle),
+            PaintType.Scene => new Scene(handle),
+            PaintType.Text => new Text(handle),
             _ => new RawPaint(handle),
         };
     }

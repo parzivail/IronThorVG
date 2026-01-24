@@ -1,0 +1,1 @@
+﻿internal sealed record EnumDefinition(string Name, string NativeName, string? Summary, IReadOnlyList<EnumValueDefinition> Values, bool IsFlags);

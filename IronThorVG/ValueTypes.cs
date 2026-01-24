@@ -183,6 +183,11 @@ public readonly record struct TextSpacing(float Letter, float Line);
 public readonly record struct SolidStroke(float Width, Color Color);
 
 /// <summary>
+/// Represents a set of path commands.
+/// </summary>
+public readonly record struct PathCommands(byte[] Commands, Point[] Points);
+
+/// <summary>
 /// Represents a segment range with a beginning and end value.
 /// </summary>
 public readonly record struct SegmentRange(float Begin, float End);

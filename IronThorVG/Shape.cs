@@ -53,7 +53,7 @@ public sealed class Shape : Paint
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_shape_get_path(PaintHandle, out nint, out uint, out nint, out uint)" />
-    public (byte[] Commands, Point[] Points) GetPath()
+    public PathCommands GetPath()
     {
         var result = ThorVGNative.tvg_shape_get_path(Handle, out var cmdsPtr, out var cmdsCnt, out var ptsPtr, out var ptsCnt);
         ResultGuard.EnsureSuccess(result);
@@ -75,7 +75,7 @@ public sealed class Shape : Paint
             }
         }
 
-        return (commands, points);
+        return new PathCommands(commands, points);
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_shape_set_stroke_width(PaintHandle, float)" />
@@ -114,7 +114,7 @@ public sealed class Shape : Paint
             ResultGuard.EnsureSuccess(result);
             return Gradient.FromHandle(handle);
         }
-        set => _ = ThorVGNative.tvg_shape_set_stroke_gradient(Handle, value?.Handle ?? throw new ArgumentNullException(nameof(value)));
+        set => _ = ThorVGNative.tvg_shape_set_stroke_gradient(Handle, value?.Handle ?? GradientHandle.Null);
     }
 
     /// <inheritdoc cref="ThorVGNative.tvg_shape_set_stroke_dash(PaintHandle, nint, uint, float)" />
@@ -237,6 +237,6 @@ public sealed class Shape : Paint
             ResultGuard.EnsureSuccess(result);
             return Gradient.FromHandle(handle);
         }
-        set => _ = ThorVGNative.tvg_shape_set_gradient(Handle, value?.Handle ?? throw new ArgumentNullException(nameof(value)));
+        set => _ = ThorVGNative.tvg_shape_set_gradient(Handle, value?.Handle ?? GradientHandle.Null);
     }
 }
